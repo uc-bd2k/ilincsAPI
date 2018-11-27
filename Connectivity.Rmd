@@ -3,12 +3,31 @@ title: "iLINCS API R Notebook"
 output:
   pdf_document: default
   html_notebook: default
+  html_document:
+    df_print: paged
 ---
 
 ## Prerequisites 
 
 ```{r}
 library(httr)
+library(jsonlite)
+```
+
+## Display Signature Libraries
+
+```{r}
+apiUrl <- "http://www.ilincs.org/api/SignatureLibraries"
+req <- GET(apiUrl)
+# content(r)
+# l <- lapply(content(r)$data, function(x) unlist(x))
+# ilincs_result <- data.frame(t(sapply(l,c)))
+# knitr::kable(t(ilincs_result))
+json <- httr::content(req, as = "text")
+# json
+ilincs_libraries <- fromJSON(json)
+# knitr::kable(
+  ilincs_libraries[,c("libraryID","libraryName")]
 ```
 
 ## Searching for signature using BROAD ID
@@ -16,15 +35,21 @@ library(httr)
 **Example :** CPC004_A375_6H:BRD-K08252256-236-17-1:10
 ```{r}
 term <- "CPC004_A375_6H:BRD-K08252256-236-17-1:10"
-apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,sep="")
-r <- GET(apiUrl)
+# term <- "MTOR"
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,"&library=LIB_5",sep="")
+req <- GET(apiUrl)
 # content(r.data)
-l <- lapply(content(r)$data, function(x) unlist(x))
-ilincs_result <- data.frame(t(sapply(l,c)))
-# ilincs_result
-knitr::kable(t(ilincs_result))
-ilincs_signatureId <- ilincs_result$signatureid
+# l <- lapply(content(r)$data, function(x) unlist(x))
+# ilincs_result <- data.frame(t(sapply(l,c)))
+# # ilincs_result
+# knitr::kable(t(ilincs_result))
+ilincs_result <- httr::content(req)$data
+dim(ilincs_result)
+ilincs_result[[1]]
+# ilincs_libraries[,c("libraryID","libraryName")]
+ilincs_signatureId <- ilincs_result[[1]]$signatureid
 ilincs_signatureId
+
 ```
 
 
@@ -58,9 +83,44 @@ ilincs_sessionId
 apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
 apiUrl
 r <- GET(apiUrl)
+l <- lapply(content(r), function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+knitr::kable(t(ilincs_result))
+ilincs_volcanoUrl <- ilincs_result$url
+ilincs_volcanoUrl <- paste("http://www.ilincs.org",ilincs_volcanoUrl,sep="")
+ilincs_volcanoUrl
+```
 
-# r <- GET("/ilincsR/volcanoPlot", body = list(sigID = paste(ilincs_signatureId)))
-# l <- lapply(content(r), function(x) unlist(x))
-# ilincs_result <- data.frame(t(sapply(l,c)))
-# knitr::kable(t(ilincs_result))
+```{r echo=FALSE, out.width='100%'}
+# knitr::include_graphics('http://eh3.uc.edu/tmp/gseaPlot_Fri_Nov_16_16_38_16_2018_257492.png')
+knitr::include_graphics(ilincs_volcanoUrl)
+```
+
+## Get connected signatures
+
+http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&lib=LIB_5
+
+## Get connected perturbations
+
+http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
+
+## Get connected perturbations
+
+http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
+
+## Get correlation plot
+http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls
+
+```{r}
+apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls"
+# req <- GET(apiUrl)
+# json <- httr::content(req, as = "text")
+# json <- fromJSON(apiUrl)
+# all.equal(plot, toJSON(fromJSON(apiUrl)))
+json <- toJSON(fromJSON(apiUrl))
+prettify(json)
+class(json)
+
+# # correlation_plot <- fromJSON(json)
+# correlation_plot
 ```
