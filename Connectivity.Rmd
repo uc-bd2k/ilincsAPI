@@ -1,0 +1,66 @@
+---
+title: "iLINCS API R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+## Prerequisites 
+
+```{r}
+library(httr)
+```
+
+## Searching for signature using BROAD ID
+
+**Example :** CPC004_A375_6H:BRD-K08252256-236-17-1:10
+```{r}
+term <- "CPC004_A375_6H:BRD-K08252256-236-17-1:10"
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,sep="")
+r <- GET(apiUrl)
+# content(r.data)
+l <- lapply(content(r)$data, function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+# ilincs_result
+knitr::kable(t(ilincs_result))
+ilincs_signatureId <- ilincs_result$signatureid
+ilincs_signatureId
+```
+
+
+## Retriving Signature Metadata
+```{r}
+# r <- POST("http://www.ilincs.org/api/SignatureMeta/uploadAndAnalyze?lib=LIB_5", body = list(file = upload_file(ftemp)))
+# r <- GET("http://www.ilincs.org/api/SignatureMeta/LINCSCP_100")
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/",ilincs_signatureId,sep="")
+r <- GET(apiUrl)
+# r
+# content(r)
+l <- lapply(content(r), function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+knitr::kable(t(ilincs_result))
+```
+
+## Downloading signature data
+```{r}
+class(paste(ilincs_signatureId))
+
+r <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId)), encode = "json")
+l <- lapply(content(r), function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+knitr::kable(t(ilincs_result))
+ilincs_sessionId <- ilincs_result$data
+ilincs_sessionId
+```
+
+## Getting volcano plot
+```{r}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
+apiUrl
+r <- GET(apiUrl)
+
+# r <- GET("/ilincsR/volcanoPlot", body = list(sigID = paste(ilincs_signatureId)))
+# l <- lapply(content(r), function(x) unlist(x))
+# ilincs_result <- data.frame(t(sapply(l,c)))
+# knitr::kable(t(ilincs_result))
+```
