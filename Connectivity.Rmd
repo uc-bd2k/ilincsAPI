@@ -10,9 +10,13 @@ output:
 ## Prerequisites 
 
 ```{r}
+library(knitr)
+library(tinytex)
 library(httr)
 library(jsonlite)
+library(plotly)
 ```
+
 
 ## Display Signature Libraries
 
@@ -93,7 +97,8 @@ ilincs_volcanoUrl
 
 ```{r echo=FALSE, out.width='100%'}
 # knitr::include_graphics('http://eh3.uc.edu/tmp/gseaPlot_Fri_Nov_16_16_38_16_2018_257492.png')
-knitr::include_graphics(ilincs_volcanoUrl)
+download.file(ilincs_volcanoUrl,'volcano.png', mode = 'wb')
+include_graphics('volcano.png')
 ```
 
 ## Get connected signatures
@@ -112,15 +117,22 @@ http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_
 http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls
 
 ```{r}
-apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls"
-# req <- GET(apiUrl)
-# json <- httr::content(req, as = "text")
-# json <- fromJSON(apiUrl)
-# all.equal(plot, toJSON(fromJSON(apiUrl)))
-json <- toJSON(fromJSON(apiUrl))
-prettify(json)
-class(json)
-
-# # correlation_plot <- fromJSON(json)
-# correlation_plot
+# apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls"
+# # req <- GET(apiUrl)
+# # json <- httr::content(req, as = "text")
+# # json <- fromJSON(apiUrl)
+# # all.equal(plot, toJSON(fromJSON(apiUrl)))
+# json <- toJSON(fromJSON(apiUrl))
+# prettify(json)
+# class(json)
+# # plotly_build(json)
+# # explorePlot = plotly_json(fromJSON(json))
+# # plotly_build(explorePlot)
+# # # correlation_plot <- fromJSON(json)
+# # correlation_plot
+apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&output=widget"
+req <- GET(apiUrl)
+corrPlotUrl <- content(req)$url
+corrPlotUrl
+htmltools::includeHTML(corrPlotUrl)
 ```
