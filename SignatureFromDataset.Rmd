@@ -1,0 +1,34 @@
+---
+title: "iLINCS API R Notebook - Creating a signature from dataset"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+## Prerequisites 
+
+```{r}
+library(knitr)
+library(tinytex)
+library(httr)
+library(jsonlite)
+library(plotly)
+```
+
+### Heatmap
+
+```{r, out.width="910px"}
+include_url("http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100", height = "900px")
+# htmltools::includeHTML("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100' target='_blank'>Heatmap</a>")
+knit_print("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100'>abc</a>")
+normal_print("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100'>abc</a>")
+cat("[Region:](www.somewebsite.com)")
+heatmap_url<-"http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100"
+```
+
+### `r heatmap_url`
+
+[Heatmap](`r heatmap_url`)
+
