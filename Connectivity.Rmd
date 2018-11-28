@@ -4,6 +4,7 @@ output:
   html_document:
     df_print: paged
   html_notebook: default
+  word_document: default
   pdf_document: default
 ---
 
@@ -15,6 +16,18 @@ library(tinytex)
 library(httr)
 library(jsonlite)
 library(plotly)
+library(htmltools)
+
+getOutputFormat <- function() {
+  output <- rmarkdown:::parse_yaml_front_matter(
+    readLines(knitr::current_input())
+    )$output
+  if (is.list(output)){
+    return(names(output)[1])
+  } else {
+    return(output[1])
+  }
+}
 ```
 
 
@@ -136,10 +149,50 @@ corrPlotUrl <- content(req)$url
 corrPlotUrl
 # htmltools::includeHTML(corrPlotUrl)
 
-# if ("HTML" %in% rmarkdown::all_output_formats(knitr::current_input())) {
+# rmarkdown::all_output_formats(knitr::current_input())
+# if ("html_document" %in% rmarkdown::all_output_formats(knitr::current_input())) {
+if(getOutputFormat() == 'html_document') {
   include_url(corrPlotUrl, height = "680px")
-# } else {
-#   corrPlotUrl
-# }
+} else {
+  print("output is not HTML")
+  print(getOutputFormat())
+  corrPlotUrl
+}
 ```
 
+## Get GSEA plot
+```{r GSEA}
+apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
+req <- POST(apiUrl, body = list(signatureId = paste(ilincs_signatureId),genes = c(51474,7112,8570,55421,283337,54386,5214,79894,6136,5514,5170,6197,2321), output="widget"), encode = "json")
+gseaPlotUrl <- content(req)
+gseaPlotUrl
+# htmltools::includeHTML(corrPlotUrl)
+
+
+# if ("html" %in% rmarkdown::all_output_formats(knitr::current_input())) {
+#   include_url(gseaPlotUrl, height = "680px")
+# } else {
+#   gseaPlotUrl
+# }
+```
+### Heatmap
+
+```{r, out.width="910px"}
+include_url("http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100", height = "900px")
+# htmltools::includeHTML("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100' target='_blank'>Heatmap</a>")
+knit_print("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100'>abc</a>")
+normal_print("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100'>abc</a>")
+cat("[Region:](www.somewebsite.com)")
+heatmap_url<-"http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100"
+```
+
+### `r heatmap_url`
+
+[Heatmap](`r heatmap_url`)
+
+### Session info
+```{r}
+options(width = 120)
+devtools::session_info()
+rmarkdown::pandoc_version()
+```
