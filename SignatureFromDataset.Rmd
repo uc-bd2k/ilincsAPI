@@ -42,6 +42,10 @@ datasetMetaData <- fromJSON(json)
 datasetMetaData
 ```
 
+[Heatmap for dataset `r experiment` on iLINCS](http://www.ilincs.org/apps/heatmap/?data_set=`r experiment`)
+
+[PCA and tSNE for dataset `r experiment` on iLINCS](http://www.ilincs.org/apps/pca/?data_set=`r experiment`)
+
 ### Dataset sample metadata
 
 
