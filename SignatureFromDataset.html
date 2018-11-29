@@ -215,6 +215,8 @@ datasetMetaData</code></pre>
 ## 
 ## $SourceID
 ## [1] &quot;EDS-1014&quot;</code></pre>
+<p><a href="http://www.ilincs.org/apps/heatmap/?data_set=EDS-1014">Heatmap for dataset EDS-1014 on iLINCS</a></p>
+<p><a href="http://www.ilincs.org/apps/pca/?data_set=EDS-1014">PCA and tSNE for dataset EDS-1014 on iLINCS</a></p>
 </div>
 <div id="dataset-sample-metadata" class="section level3">
 <h3>Dataset sample metadata</h3>
@@ -230,25 +232,42 @@ sampleMetaData</code></pre>
   </script>
 </div>
 <pre class="r"><code># sampleMetaData[c(&quot;experiment&quot;,&quot;assay&quot;,&quot;dataType&quot;)]</code></pre>
+</div>
+</div>
+<div id="creating-signature-using-ilincs" class="section level2">
+<h2>Creating signature using iLINCS</h2>
 <p><a href="http://www.ilincs.org/ilincs/dataset/EDS-1014/createSignature">Create signature from dataset EDS-1014 on iLINCS</a></p>
 </div>
+<div id="creating-signature-using-ilincs-api" class="section level2">
+<h2>Creating signature using iLINCS API</h2>
+<pre class="r"><code>property &lt;- &quot;ER&quot;
+level1 &lt;- &quot;ER:+&quot;
+level2 &lt;- &quot;ER:-&quot;
+apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/LincsDataAnalysis&quot;
+req &lt;- POST(apiUrl, body = list(exp = paste(experiment),prop = property,filterchk=paste(level1,level2,sep = &quot;,,,&quot;),includeORexclude=1), encode = &quot;json&quot;)
+createdSignaturesSessionID &lt;- content(req)$sessionID
+createdSignaturesSessionID</code></pre>
+<pre><code>## [1] &quot;Thu_Nov_29_16_37_26_2018_3167554&quot;</code></pre>
+<pre class="r"><code># gseaPlotUrl &lt;- paste(&quot;http://www.ilincs.org/tmp/&quot;,gseaPlotPng,&quot;.png&quot;,sep=&quot;&quot;)
+# gseaPlotUrl
+# download.file(gseaPlotUrl,'GSEA.png', mode = 'wb')
+# include_graphics('GSEA.png')</code></pre>
 <div id="heatmap" class="section level3">
 <h3>Heatmap</h3>
-<pre class="r"><code>include_url(&quot;http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100&quot;, height = &quot;900px&quot;)</code></pre>
-<iframe src="http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100" width="910px" height="900px">
+<pre class="r"><code>heatmap_url&lt;-paste(&quot;http://www.ilincs.org/apps/heatmap/?sessionID=&quot;,createdSignaturesSessionID,&quot;&amp;property=&quot;,property,&quot;&amp;geneCount=100&quot;,sep = &quot;&quot;)
+include_url(heatmap_url, height = &quot;900px&quot;)</code></pre>
+<iframe src="http://www.ilincs.org/apps/heatmap/?sessionID=Thu_Nov_29_16_37_26_2018_3167554&amp;property=ER&amp;geneCount=100" width="910px" height="900px">
 </iframe>
-<pre class="r"><code># htmltools::includeHTML(&quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100' target='_blank'&gt;Heatmap&lt;/a&gt;&quot;)
-knit_print(&quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100'&gt;abc&lt;/a&gt;&quot;)</code></pre>
-<pre><code>## [1] &quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100'&gt;abc&lt;/a&gt;&quot;</code></pre>
-<pre class="r"><code>normal_print(&quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100'&gt;abc&lt;/a&gt;&quot;)</code></pre>
-<pre><code>## [1] &quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100'&gt;abc&lt;/a&gt;&quot;</code></pre>
-<pre class="r"><code>cat(&quot;[Region:](www.somewebsite.com)&quot;)</code></pre>
-<pre><code>## [Region:](www.somewebsite.com)</code></pre>
-<pre class="r"><code>heatmap_url&lt;-&quot;http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100&quot;</code></pre>
+<pre class="r"><code># include_url(&quot;http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100&quot;, height = &quot;900px&quot;)
+# htmltools::includeHTML(&quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100' target='_blank'&gt;Heatmap&lt;/a&gt;&quot;)
+# knit_print(&quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100'&gt;abc&lt;/a&gt;&quot;)
+# normal_print(&quot;&lt;a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100'&gt;abc&lt;/a&gt;&quot;)
+# cat(&quot;[Region:](www.somewebsite.com)&quot;)
+# heatmap_url&lt;-&quot;http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100&quot;</code></pre>
+<!-- ### http://www.ilincs.org/apps/heatmap/?sessionID=Thu_Nov_29_16_37_26_2018_3167554&property=ER&geneCount=100 -->
+<div id="heatmap-in-ilincs" class="section level4">
+<h4><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Thu_Nov_29_16_37_26_2018_3167554&amp;property=ER&amp;geneCount=100">Heatmap in iLINCS</a></h4>
 </div>
-<div id="httpwww.ilincs.orgappsheatmapsessionidwed_nov_28_14_02_36_2018_3471356propertyck14genecount100" class="section level3">
-<h3><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100" class="uri">http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100</a></h3>
-<p><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&amp;property=CK14&amp;geneCount=100">Heatmap</a></p>
 </div>
 </div>
 
