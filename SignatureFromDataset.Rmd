@@ -43,8 +43,19 @@ datasetMetaData
 ```
 
 ### Dataset sample metadata
-http://www.ilincs.org/api/ilincsR/getSamples?id=EDS-1014
 
+
+```{r}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/getSamples?id=",experiment,sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+sampleMeta <- fromJSON(json)
+sampleMetaData <- data.frame(sampleMeta$data$rows)
+sampleMetaData
+# sampleMetaData[c("experiment","assay","dataType")]
+```
+
+[Create signature from dataset `r experiment` on iLINCS](http://www.ilincs.org/ilincs/dataset/`r experiment`/createSignature)
 
 ### Heatmap
 
