@@ -180,7 +180,7 @@ ilincs_signatureId</code></pre>
 ilincs_sessionId&lt;-unlist(content(req))
 ilincs_sessionId</code></pre>
 <pre><code>##                                   data 
-## &quot;sig_Thu_Nov_29_13_07_41_2018_1353596&quot;</code></pre>
+## &quot;sig_Thu_Nov_29_13_50_05_2018_7142689&quot;</code></pre>
 </div>
 <div id="retrieving-data" class="section level1">
 <h1>Retrieving data</h1>
@@ -203,6 +203,22 @@ knitr::include_graphics(ilincs_volcanoUrl)</code></pre>
 <div id="get-connected-signatures" class="section level2">
 <h2>Get connected signatures</h2>
 <p><a href="http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&amp;lib=LIB_5" class="uri">http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&amp;lib=LIB_5</a></p>
+</div>
+<div id="find-enriched-signatures" class="section level2">
+<h2>Find enriched signatures</h2>
+<pre class="r"><code>glist&lt;-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],&quot;Name_GeneSymbol&quot;],collapse = &quot;,&quot;)
+glist</code></pre>
+<pre><code>## [1] &quot;RFX5,CCNE2,LYPLA1,LAP3,CNDP2,FSD1,G3BP1,UTP14A,EIF5,VAPB,RRP12,EXT1,TOR1A,NPDC1,SMC1A,C2CD2L,CLTB,NPRL2,MALT1,SLC11A2,TEX10,MAPK13,AGL,HPRT1,ENOPH1,FAIM,HSD17B10,TNIP1,CHMP4A,TIMM17B,HN1L,PMM2,USP7,CDCA4,COASY,KIF14,DAG1,SRC,PHKB,ZMIZ1,GNB5,FBXO7,ACAA1,CAPN1,FOXO3,SSBP2,ZNF589,RRP8,ICAM3,KIT,TMEM109,IKBKE,NUCB2,SUV39H1,SNX6,ATF1,ALDOC,MEF2C,DERA,MAPKAPK2,THAP11,RAB31,UBE2J1,PDGFA,AXIN1,MYCBP2,RHOA,UBQLN2,TMEM97,HMGA2,KIF5C,POLB,CDK5R1,ATMIN,DECR1,YKT6,SFN,ORC1,CSRP1,CDC45,ADO,FBXL12,PROS1,MAPK1IP1L,FAM20B,IL13RA1,FKBP14,MAP3K4,ITFG1,POP4,WASF3,ADRB2,MYLK,TRAP1,PIGB,ABL1,MYL9,SNX13,PIH1D1,PRKAG2&quot;</code></pre>
+<pre class="r"><code>apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/GeneListEnrichment&quot;
+req &lt;- POST(apiUrl, body = list(geneList=glist, libName=&quot;LIB_5&quot;), encode = &quot;form&quot;)
+connectedSignatures &lt;- data.table::rbindlist(content(req), use.names = TRUE, fill = TRUE)
+
+head(connectedSignatures)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["tableNames"],"name":[1],"type":["chr"],"align":["left"]},{"label":["zScores"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["compound"],"name":[3],"type":["chr"],"align":["left"]},{"label":["concentration"],"name":[4],"type":["chr"],"align":["left"]},{"label":["cellLine"],"name":[5],"type":["chr"],"align":["left"]},{"label":["time"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"LINCSCP_100","2":"17.3629","3":"Diclofenac","4":"LSM-2160","5":"10uM","6":"A375"},{"1":"LINCSCP_65","2":"7.4109","3":"Chlorthalidone","4":"LSM-1417","5":"10uM","6":"A375"},{"1":"LINCSCP_109","2":"7.3279","3":"RS-39604","4":"LSM-2461","5":"10uM","6":"A375"},{"1":"LINCSCP_138","2":"7.2192","3":"Cilostazol","4":"LSM-3491","5":"10uM","6":"A375"},{"1":"LINCSCP_66","2":"6.8862","3":"Altrenogest","4":"LSM-1424","5":"10uM","6":"A375"},{"1":"LINCSCP_176623","2":"6.7815","3":"Dexamethasone Acetate","4":"LSM-1915","5":"10uM","6":"A375"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 </div>
 <div id="get-connected-perturbations" class="section level2">
 <h2>Get connected perturbations</h2>
@@ -232,7 +248,7 @@ apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCS
 req &lt;- GET(apiUrl)
 corrPlotUrl &lt;- content(req)$url
 corrPlotUrl</code></pre>
-<pre><code>## [1] &quot;http://www.ilincs.org/ocpu/tmp/x07528dc804/files/corrPlot.html&quot;</code></pre>
+<pre><code>## [1] &quot;http://www.ilincs.org/ocpu/tmp/x040f7f417e/files/corrPlot.html&quot;</code></pre>
 <pre class="r"><code># htmltools::includeHTML(corrPlotUrl)
 
 # rmarkdown::all_output_formats(knitr::current_input())
@@ -244,7 +260,7 @@ if(getOutputFormat() == 'html_document') {
   print(getOutputFormat())
   corrPlotUrl
 }</code></pre>
-<iframe src="http://www.ilincs.org/ocpu/tmp/x07528dc804/files/corrPlot.html" width="672" height="680px">
+<iframe src="http://www.ilincs.org/ocpu/tmp/x040f7f417e/files/corrPlot.html" width="672" height="680px">
 </iframe>
 </div>
 <div id="get-gsea-plot" class="section level2">

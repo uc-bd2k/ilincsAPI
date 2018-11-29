@@ -146,7 +146,7 @@ $(document).ready(function () {
 </style>
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Connectivity-m2.Rmd");
+  window.initializeSourceEmbed("enrichment-m.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
@@ -179,50 +179,17 @@ $(document).ready(function () {
 <!-- ## Prerequisites  -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
-<div id="display-signature-libraries" class="section level2">
-<h2>Display Signature Libraries</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXBpVXJsIDwtIFwiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9TaWduYXR1cmVMaWJyYXJpZXNcIlxucmVxIDwtIEdFVChhcGlVcmwpXG5qc29uIDwtIGh0dHI6OmNvbnRlbnQocmVxLCBhcyA9IFwidGV4dFwiKVxuaWxpbmNzX2xpYnJhcmllcyA8LSBmcm9tSlNPTihqc29uKVxuaWxpbmNzX2xpYnJhcmllc1ssYyhcImxpYnJhcnlJRFwiLFwibGlicmFyeU5hbWVcIildXG5gYGAifQ== -->
-<pre class="r"><code>apiUrl &lt;- &quot;http://www.ilincs.org/api/SignatureLibraries&quot;
-req &lt;- GET(apiUrl)
-json &lt;- httr::content(req, as = &quot;text&quot;)
-ilincs_libraries &lt;- fromJSON(json)
-ilincs_libraries[,c(&quot;libraryID&quot;,&quot;libraryName&quot;)]</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="searching-for-signature-using-broad-id" class="section level2">
-<h2>Searching for signature using BROAD ID</h2>
-<p>Searching for signature for given term. In this example “Diclofenac” coumpound will be shown as an example.</p>
-<p><strong>Term :</strong> Diclofenac</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVybSA8LSBcIkRpY2xvZmVuYWNcIlxuYXBpVXJsIDwtIHBhc3RlKFwiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9TaWduYXR1cmVNZXRhL2ZpbmRUZXJtV2l0aFN5bm9ueW1zP3Rlcm09XCIsdGVybSxcIiZsaWJyYXJ5PUxJQl81XCIsc2VwPVwiXCIpXG5yZXEgPC0gR0VUKGFwaVVybClcblxuaWxpbmNzX3Jlc3VsdCA8LSBsYXBwbHkoaHR0cjo6Y29udGVudChyZXEpJGRhdGEsdW5saXN0KVxuaWxpbmNzX3Jlc3VsdF9kZjwtdChkYXRhLmZyYW1lKGxhcHBseShpbGluY3NfcmVzdWx0LGZ1bmN0aW9uKHgpIHtcbiAgaWYobGVuZ3RoKHgpPDE4KXg8LWMoeCxpc19leGFtcGxhcj0wKVxuICB4fSksc3RyaW5nc0FzRmFjdG9ycyA9IEYpKVxucm93bmFtZXMoaWxpbmNzX3Jlc3VsdF9kZik8LU5VTExcblxuaGVhZChpbGluY3NfcmVzdWx0X2RmWyxjKFwiY2VsbGxpbmVcIixcImNvbXBvdW5kXCIsXCJjb25jZW50cmF0aW9uXCIsXCJzaWduYXR1cmVpZFwiLFwiaXNfZXhlbXBsYXJcIildKVxuYGBgIn0= -->
-<pre class="r"><code>term &lt;- &quot;Diclofenac&quot;
-apiUrl &lt;- paste(&quot;http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=&quot;,term,&quot;&amp;library=LIB_5&quot;,sep=&quot;&quot;)
-req &lt;- GET(apiUrl)
-
-ilincs_result &lt;- lapply(httr::content(req)$data,unlist)
-ilincs_result_df&lt;-t(data.frame(lapply(ilincs_result,function(x) {
-  if(length(x)&lt;18)x&lt;-c(x,is_examplar=0)
-  x}),stringsAsFactors = F))
-rownames(ilincs_result_df)&lt;-NULL
-
-head(ilincs_result_df[,c(&quot;cellline&quot;,&quot;compound&quot;,&quot;concentration&quot;,&quot;signatureid&quot;,&quot;is_exemplar&quot;)])</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
 <div id="selecting-a-signature-to-analyze" class="section level1">
 <h1>Selecting a signature to analyze</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaWxpbmNzX3NpZ25hdHVyZUlkIDwtIGlsaW5jc19yZXN1bHRfZGZbMSxcInNpZ25hdHVyZWlkXCJdXG5pbGluY3Nfc2lnbmF0dXJlSWRcbmBgYCJ9 -->
-<pre class="r"><code>ilincs_signatureId &lt;- ilincs_result_df[1,&quot;signatureid&quot;]
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaWxpbmNzX3NpZ25hdHVyZUlkIDwtIFwiTElOQ1NfQ1AxMDBcIlxuaWxpbmNzX3NpZ25hdHVyZUlkXG5gYGAifQ== -->
+<pre class="r"><code>ilincs_signatureId &lt;- &quot;LINCS_CP100&quot;
 ilincs_signatureId</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiTElOQ1NfQ1AxMDBcIlxuIn0= -->
+<pre><code>[1] &quot;LINCS_CP100&quot;</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="getting-signature-data-and-vulcano-plot" class="section level2">
@@ -238,6 +205,16 @@ ilincs_signatureId</code></pre>
 ilincs_sessionId&lt;-unlist(content(req))
 ilincs_sessionId</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVycm9yLm5hbWUgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwiRXJyb3IgaW4gaUxpbmNzUiBkb3dubG9hZFNpZ25hdHVyZSBmdW5jdGlvbi4gTm8gZ2VuZXMgb3Igd3JvbmcgZGF0YSBzZXQgcGlja2VkLlwiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlcnJvci5zdGF0dXMgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcIjQwMFwiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVycm9yLm1lc3NhZ2UgXG5cImNvdWxkIG5vdCBydW4gc3RhdGVtZW50OiBZb3UgaGF2ZSBhbiBlcnJvciBpbiB5b3VyIFNRTCBzeW50YXg7IGNoZWNrIHRoZSBtYW51YWwgdGhhdCBjb3JyZXNwb25kcyB0byB5b3VyIE15U1FMIHNlcnZlciB2ZXJzaW9uIGZvciB0aGUgcmlnaHQgc3ludGF4IHRvIHVzZSBuZWFyICdmcm9tICB3aGVyZSBzaWduYXR1cmVJRD0nTElOQ1NfQ1AxMDAnJyBhdCBsaW5lIDFcXG5cXG5JbiBjYWxsOlxcbi5sb2NhbChjb25uLCBzdGF0ZW1lbnQsIC4uLilcXG5cIiBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlcnJvci5jb2RlIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcImlsaW5jc1JfRVJST1JcIiBcbiJ9 -->
+<pre><code>                                                                                                                                                                                                                                                    error.name 
+                                                                                                                                                                             &quot;Error in iLincsR downloadSignature function. No genes or wrong data set picked.&quot; 
+                                                                                                                                                                                                                                                  error.status 
+                                                                                                                                                                                                                                                         &quot;400&quot; 
+                                                                                                                                                                                                                                                 error.message 
+&quot;could not run statement: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'from  where signatureID='LINCS_CP100'' at line 1\n\nIn call:\n.local(conn, statement, ...)\n&quot; 
+                                                                                                                                                                                                                                                    error.code 
+                                                                                                                                                                                                                                               &quot;ilincsR_ERROR&quot; </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -245,46 +222,27 @@ ilincs_sessionId</code></pre>
 <h1>Retrieving data</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmlsZVVybD1wYXN0ZShcImh0dHA6Ly93d3cuaWxpbmNzLm9yZy90bXAvXCIsaWxpbmNzX3Nlc3Npb25JZCxcIi54bHNcIixzZXA9XCJcIilcbnNpZ25hdHVyZURhdGE8LXJlYWQudGFibGUoZmlsZVVybCxzZXA9XCJcXHRcIixoZWFkZXI9VCxzdHJpbmdzQXNGYWN0b3JzID0gRilcbmhlYWQoc2lnbmF0dXJlRGF0YSlcbmBgYCJ9 -->
-<pre class="r"><code>fileUrl=paste(&quot;http://www.ilincs.org/tmp/&quot;,ilincs_sessionId,&quot;.xls&quot;,sep=&quot;&quot;)
-signatureData&lt;-read.table(fileUrl,sep=&quot;\t&quot;,header=T,stringsAsFactors = F)
-head(signatureData)</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-</div>
-<div id="insert-volcano-plot" class="section level1">
-<h1>Insert volcano plot</h1>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXBpVXJsIDwtIHBhc3RlKFwiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL3ZvbGNhbm9QbG90P2ZpbGU9XCIsaWxpbmNzX3Nlc3Npb25JZCxcIi54bHNcIixzZXA9XCJcIilcbnJlcSA8LSBHRVQoYXBpVXJsKVxuaWxpbmNzX3ZvbGNhbm9Vcmw8LXBhc3RlKFwiaHR0cDovL3d3dy5pbGluY3Mub3JnXCIsY29udGVudChyZXEpJHVybCxzZXA9XCJcIilcbmtuaXRyOjppbmNsdWRlX2dyYXBoaWNzKGlsaW5jc192b2xjYW5vVXJsKVxuYGBgIn0= -->
-<pre class="r"><code>apiUrl &lt;- paste(&quot;http://www.ilincs.org/api/ilincsR/volcanoPlot?file=&quot;,ilincs_sessionId,&quot;.xls&quot;,sep=&quot;&quot;)
-req &lt;- GET(apiUrl)
-ilincs_volcanoUrl&lt;-paste(&quot;http://www.ilincs.org&quot;,content(req)$url,sep=&quot;&quot;)
-knitr::include_graphics(ilincs_volcanoUrl)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="get-connected-signatures" class="section level2">
-<h2>Get connected signatures</h2>
-<p><a href="http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&amp;lib=LIB_5" class="uri">http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&amp;lib=LIB_5</a></p>
-</div>
 <div id="find-enriched-signatures" class="section level2">
 <h2>Find enriched signatures</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChjb25uZWN0ZWRTaWduYXR1cmVzKVxuXG5gYGAifQ== -->
-<pre class="r"><code>head(connectedSignatures)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2xpc3Q8LXBhc3RlKHNpZ25hdHVyZURhdGFbb3JkZXIoc2lnbmF0dXJlRGF0YSRTaWduaWZpY2FuY2VfcHZhbHVlKVsxOjEwMF0sXCJOYW1lX0dlbmVTeW1ib2xcIl0sY29sbGFwc2UgPSBcIixcIilcbmFwaVVybCA8LSBcImh0dHA6Ly93d3cuaWxpbmNzLm9yZy9hcGkvaWxpbmNzUi9HZW5lTGlzdEVucmljaG1lbnRcIlxucmVxIDwtIFBPU1QoYXBpVXJsLCBib2R5ID0gbGlzdChnZW5lTGlzdD1nbGlzdCwgbGliTmFtZT1cIkxJQl81XCIpLCBlbmNvZGUgPSBcImZvcm1cIilcbmNvbm5lY3RlZFNpZ25hdHVyZXMgPC0gZGF0YS50YWJsZTo6cmJpbmRsaXN0KGNvbnRlbnQocmVxKSwgdXNlLm5hbWVzID0gVFJVRSwgZmlsbCA9IFRSVUUpXG5oZWFkKG91dHB1dClcbmBgYCJ9 -->
+<pre class="r"><code>glist&lt;-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],&quot;Name_GeneSymbol&quot;],collapse = &quot;,&quot;)
+apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/GeneListEnrichment&quot;
+req &lt;- POST(apiUrl, body = list(geneList=glist, libName=&quot;LIB_5&quot;), encode = &quot;form&quot;)
+connectedSignatures &lt;- data.table::rbindlist(content(req), use.names = TRUE, fill = TRUE)
+head(output)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgIHRhYmxlTmFtZXMgelNjb3JlcyAgICAgICAgICAgICAgY29tcG91bmQgY29uY2VudHJhdGlvbiBjZWxsTGluZSB0aW1lXG4xOiAgICBMSU5DU0NQXzEwMCAxNy4zNjI5ICAgICAgICAgICAgRGljbG9mZW5hYyAgICAgIExTTS0yMTYwICAgICAxMHVNIEEzNzVcbjI6ICAgICBMSU5DU0NQXzY1ICA3LjQxMDkgICAgICAgIENobG9ydGhhbGlkb25lICAgICAgTFNNLTE0MTcgICAgIDEwdU0gQTM3NVxuMzogICAgTElOQ1NDUF8xMDkgIDcuMzI3OSAgICAgICAgICAgICAgUlMtMzk2MDQgICAgICBMU00tMjQ2MSAgICAgMTB1TSBBMzc1XG40OiAgICBMSU5DU0NQXzEzOCAgNy4yMTkyICAgICAgICAgICAgQ2lsb3N0YXpvbCAgICAgIExTTS0zNDkxICAgICAxMHVNIEEzNzVcbjU6ICAgICBMSU5DU0NQXzY2ICA2Ljg4NjIgICAgICAgICAgIEFsdHJlbm9nZXN0ICAgICAgTFNNLTE0MjQgICAgIDEwdU0gQTM3NVxuNjogTElOQ1NDUF8xNzY2MjMgIDYuNzgxNSBEZXhhbWV0aGFzb25lIEFjZXRhdGUgICAgICBMU00tMTkxNSAgICAgMTB1TSBBMzc1XG4ifQ== -->
-<pre><code>       tableNames zScores              compound concentration cellLine time
-1:    LINCSCP_100 17.3629            Diclofenac      LSM-2160     10uM A375
-2:     LINCSCP_65  7.4109        Chlorthalidone      LSM-1417     10uM A375
-3:    LINCSCP_109  7.3279              RS-39604      LSM-2461     10uM A375
-4:    LINCSCP_138  7.2192            Cilostazol      LSM-3491     10uM A375
-5:     LINCSCP_66  6.8862           Altrenogest      LSM-1424     10uM A375
-6: LINCSCP_176623  6.7815 Dexamethasone Acetate      LSM-1915     10uM A375</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgIHRhYmxlTmFtZXMgelNjb3JlcyAgICAgICAgICAgICAgIGNvbXBvdW5kIGNvbmNlbnRyYXRpb24gY2VsbExpbmUgICAgIHRpbWVcbjE6ICBMSU5DU0NQXzM5MDIwICA1LjM1MzMgICAgICAgICAgICBQYWxib2NpY2xpYiAgICAgIExTTS0xMDcxICAgICAxMHVNIE1EQU1CMjMxXG4yOiBMSU5DU0NQXzE0NTM4NCAgNS4xNTgyICAgICAgICAgICAgIFBIQS03OTM4ODcgICAgICBMU00tMTA3MyAgIDEuMTF1TSBNREFNQjIzMVxuMzogICBMSU5DU0NQXzYxNjkgIDUuMTExMCBCUkQtSzQyMTI1OTAwLTAwMS0wMS05ICAgICAgTFNNLTU1MzUgICAgIDEwdU0gICAgIEE1NDlcbjQ6ICBMSU5DU0NQXzU2OTcwICA1LjA2NDIgICAgICAgICAgICAgICAgUFMtMTE0NSAgICAgIExTTS01OTc1ICAgICAgNXVNICAgICBWQ0FQXG41OiBMSU5DU0NQXzE1MjIzMSAgNC44Mzg2ICAgICAgICAgICAgUEYtMDM3NTgzMDkgICAgICBMU00tNDI1NCAgIDAuMTJ1TSAgICAgIFBDM1xuNjogICBMSU5DU0NQXzQyNTMgIDQuNzI0NiAgICAgICAgICAgICAgICAgIE1BWjUxICAgICBMU00tNDMwNDQgICAgIDEwdU0gICAgIEE1NDlcbiJ9 -->
+<pre><code>       tableNames zScores               compound concentration cellLine     time
+1:  LINCSCP_39020  5.3533            Palbociclib      LSM-1071     10uM MDAMB231
+2: LINCSCP_145384  5.1582             PHA-793887      LSM-1073   1.11uM MDAMB231
+3:   LINCSCP_6169  5.1110 BRD-K42125900-001-01-9      LSM-5535     10uM     A549
+4:  LINCSCP_56970  5.0642                PS-1145      LSM-5975      5uM     VCAP
+5: LINCSCP_152231  4.8386            PF-03758309      LSM-4254   0.12uM      PC3
+6:   LINCSCP_4253  4.7246                  MAZ51     LSM-43044     10uM     A549</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-chunk-begin -->
@@ -296,93 +254,10 @@ connectedSignatures &lt;- data.table::rbindlist(content(req), use.names = TRUE, 
 head(connectedSignatures)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="get-connected-perturbations" class="section level2">
-<h2>Get connected perturbations</h2>
-<p><a href="http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&amp;library=LIB_5" class="uri">http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&amp;library=LIB_5</a></p>
-</div>
-<div id="get-connected-perturbations-1" class="section level2">
-<h2>Get connected perturbations</h2>
-<p><a href="http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&amp;library=LIB_5" class="uri">http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&amp;library=LIB_5</a></p>
-</div>
-<div id="get-correlation-plot" class="section level2">
-<h2>Get correlation plot</h2>
-<p><a href="http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&amp;sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls" class="uri">http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&amp;sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls</a></p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBhcGlVcmwgPC0gXCJodHRwOi8vd3d3LmlsaW5jcy5vcmcvYXBpL2lsaW5jc1IvY29ycmVsYXRpb25QbG90P3NpZ0lEPUxJTkNTQ1BfMTAyNzAmc2lnRmlsZT1zaWdfVHVlX05vdl8yN18xM18yMV8zNl8yMDE4XzkwMDczMzEueGxzXCJcbiMgIyByZXEgPC0gR0VUKGFwaVVybClcbiMgIyBqc29uIDwtIGh0dHI6OmNvbnRlbnQocmVxLCBhcyA9IFwidGV4dFwiKVxuIyAjIGpzb24gPC0gZnJvbUpTT04oYXBpVXJsKVxuIyAjIGFsbC5lcXVhbChwbG90LCB0b0pTT04oZnJvbUpTT04oYXBpVXJsKSkpXG4jIGpzb24gPC0gdG9KU09OKGZyb21KU09OKGFwaVVybCkpXG4jIHByZXR0aWZ5KGpzb24pXG4jIGNsYXNzKGpzb24pXG4jICMgcGxvdGx5X2J1aWxkKGpzb24pXG4jICMgZXhwbG9yZVBsb3QgPSBwbG90bHlfanNvbihmcm9tSlNPTihqc29uKSlcbiMgIyBwbG90bHlfYnVpbGQoZXhwbG9yZVBsb3QpXG4jICMgIyBjb3JyZWxhdGlvbl9wbG90IDwtIGZyb21KU09OKGpzb24pXG4jICMgY29ycmVsYXRpb25fcGxvdFxuYXBpVXJsIDwtIFwiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL2NvcnJlbGF0aW9uUGxvdD9zaWdJRD1MSU5DU0NQXzEwMjcwJnNpZ0ZpbGU9c2lnX1R1ZV9Ob3ZfMjdfMTNfMjFfMzZfMjAxOF85MDA3MzMxLnhscyZvdXRwdXQ9d2lkZ2V0XCJcbnJlcSA8LSBHRVQoYXBpVXJsKVxuY29yclBsb3RVcmwgPC0gY29udGVudChyZXEpJHVybFxuY29yclBsb3RVcmxcbiMgaHRtbHRvb2xzOjppbmNsdWRlSFRNTChjb3JyUGxvdFVybClcblxuIyBybWFya2Rvd246OmFsbF9vdXRwdXRfZm9ybWF0cyhrbml0cjo6Y3VycmVudF9pbnB1dCgpKVxuIyBpZiAoXCJodG1sX2RvY3VtZW50XCIgJWluJSBybWFya2Rvd246OmFsbF9vdXRwdXRfZm9ybWF0cyhrbml0cjo6Y3VycmVudF9pbnB1dCgpKSkge1xuaWYoZ2V0T3V0cHV0Rm9ybWF0KCkgPT0gJ2h0bWxfZG9jdW1lbnQnKSB7XG4gIGluY2x1ZGVfdXJsKGNvcnJQbG90VXJsLCBoZWlnaHQgPSBcIjY4MHB4XCIpXG59IGVsc2Uge1xuICBwcmludChcIm91dHB1dCBpcyBub3QgSFRNTFwiKVxuICBwcmludChnZXRPdXRwdXRGb3JtYXQoKSlcbiAgY29yclBsb3RVcmxcbn1cbmBgYCJ9 -->
-<pre class="r"><code># apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&amp;sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&quot;
-# # req &lt;- GET(apiUrl)
-# # json &lt;- httr::content(req, as = &quot;text&quot;)
-# # json &lt;- fromJSON(apiUrl)
-# # all.equal(plot, toJSON(fromJSON(apiUrl)))
-# json &lt;- toJSON(fromJSON(apiUrl))
-# prettify(json)
-# class(json)
-# # plotly_build(json)
-# # explorePlot = plotly_json(fromJSON(json))
-# # plotly_build(explorePlot)
-# # # correlation_plot &lt;- fromJSON(json)
-# # correlation_plot
-apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&amp;sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&amp;output=widget&quot;
-req &lt;- GET(apiUrl)
-corrPlotUrl &lt;- content(req)$url
-corrPlotUrl
-# htmltools::includeHTML(corrPlotUrl)
-
-# rmarkdown::all_output_formats(knitr::current_input())
-# if (&quot;html_document&quot; %in% rmarkdown::all_output_formats(knitr::current_input())) {
-if(getOutputFormat() == 'html_document') {
-  include_url(corrPlotUrl, height = &quot;680px&quot;)
-} else {
-  print(&quot;output is not HTML&quot;)
-  print(getOutputFormat())
-  corrPlotUrl
-}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="get-gsea-plot" class="section level2">
-<h2>Get GSEA plot</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXBpVXJsIDwtIFwiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL3Bsb3RHU0VBXCJcbnJlcSA8LSBQT1NUKGFwaVVybCwgYm9keSA9IGxpc3Qoc2lnbmF0dXJlSWQgPSBwYXN0ZShpbGluY3Nfc2lnbmF0dXJlSWQpLGdlbmVzID0gYyg1MTQ3NCw3MTEyLDg1NzAsNTU0MjEsMjgzMzM3LDU0Mzg2LDUyMTQsNzk4OTQsNjEzNiw1NTE0LDUxNzAsNjE5NywyMzIxKSwgb3V0cHV0PVwid2lkZ2V0XCIpLCBlbmNvZGUgPSBcImpzb25cIilcbmdzZWFQbG90VXJsIDwtIGNvbnRlbnQocmVxKVxuZ3NlYVBsb3RVcmxcbiMgaHRtbHRvb2xzOjppbmNsdWRlSFRNTChjb3JyUGxvdFVybClcblxuXG4jIGlmIChcImh0bWxcIiAlaW4lIHJtYXJrZG93bjo6YWxsX291dHB1dF9mb3JtYXRzKGtuaXRyOjpjdXJyZW50X2lucHV0KCkpKSB7XG4jICAgaW5jbHVkZV91cmwoZ3NlYVBsb3RVcmwsIGhlaWdodCA9IFwiNjgwcHhcIilcbiMgfSBlbHNlIHtcbiMgICBnc2VhUGxvdFVybFxuIyB9XG5gYGAifQ== -->
-<pre class="r"><code>apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/plotGSEA&quot;
-req &lt;- POST(apiUrl, body = list(signatureId = paste(ilincs_signatureId),genes = c(51474,7112,8570,55421,283337,54386,5214,79894,6136,5514,5170,6197,2321), output=&quot;widget&quot;), encode = &quot;json&quot;)
-gseaPlotUrl &lt;- content(req)
-gseaPlotUrl
-# htmltools::includeHTML(corrPlotUrl)
-
-
-# if (&quot;html&quot; %in% rmarkdown::all_output_formats(knitr::current_input())) {
-#   include_url(gseaPlotUrl, height = &quot;680px&quot;)
-# } else {
-#   gseaPlotUrl
-# }</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="retriving-signature-metadata" class="section level2">
-<h2>Retriving Signature Metadata</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXBpVXJsIDwtIHBhc3RlKFwiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9TaWduYXR1cmVNZXRhL1wiLGlsaW5jc19zaWduYXR1cmVJZCxzZXA9XCJcIilcbnJlcSA8LSBHRVQoYXBpVXJsKVxubCA8LSBsYXBwbHkoY29udGVudChyZXEpLCBmdW5jdGlvbih4KSB1bmxpc3QoeCkpXG5pbGluY3NfcmVzdWx0IDwtIGRhdGEuZnJhbWUodChzYXBwbHkobCxjKSkpXG5rbml0cjo6a2FibGUodChpbGluY3NfcmVzdWx0KSlcbmBgYCJ9 -->
-<pre class="r"><code>apiUrl &lt;- paste(&quot;http://www.ilincs.org/api/SignatureMeta/&quot;,ilincs_signatureId,sep=&quot;&quot;)
-req &lt;- GET(apiUrl)
-l &lt;- lapply(content(req), function(x) unlist(x))
-ilincs_result &lt;- data.frame(t(sapply(l,c)))
-knitr::kable(t(ilincs_result))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiaUxJTkNTIEFQSSBSIE5vdGVib29rIgpvdXRwdXQ6CiAgaHRtbF9kb2N1bWVudDoKICAgIGRmX3ByaW50OiBwYWdlZAogIGh0bWxfbm90ZWJvb2s6IGRlZmF1bHQKICB3b3JkX2RvY3VtZW50OiBkZWZhdWx0CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0Ci0tLQoKPCEtLSAjIyBQcmVyZXF1aXNpdGVzICAtLT4KCmBgYHtyIGluY2x1ZGUgPSBGQUxTRX0KbGlicmFyeShrbml0cikKbGlicmFyeSh0aW55dGV4KQpsaWJyYXJ5KGh0dHIpCmxpYnJhcnkoanNvbmxpdGUpCmxpYnJhcnkocGxvdGx5KQpsaWJyYXJ5KGh0bWx0b29scykKCmdldE91dHB1dEZvcm1hdCA8LSBmdW5jdGlvbigpIHsKICBvdXRwdXQgPC0gcm1hcmtkb3duOjo6cGFyc2VfeWFtbF9mcm9udF9tYXR0ZXIoCiAgICByZWFkTGluZXMoa25pdHI6OmN1cnJlbnRfaW5wdXQoKSkKICAgICkkb3V0cHV0CiAgaWYgKGlzLmxpc3Qob3V0cHV0KSl7CiAgICByZXR1cm4obmFtZXMob3V0cHV0KVsxXSkKICB9IGVsc2UgewogICAgcmV0dXJuKG91dHB1dFsxXSkKICB9Cn0KYGBgCgoKIyMgRGlzcGxheSBTaWduYXR1cmUgTGlicmFyaWVzCgpgYGB7cn0KYXBpVXJsIDwtICJodHRwOi8vd3d3LmlsaW5jcy5vcmcvYXBpL1NpZ25hdHVyZUxpYnJhcmllcyIKcmVxIDwtIEdFVChhcGlVcmwpCmpzb24gPC0gaHR0cjo6Y29udGVudChyZXEsIGFzID0gInRleHQiKQppbGluY3NfbGlicmFyaWVzIDwtIGZyb21KU09OKGpzb24pCmlsaW5jc19saWJyYXJpZXNbLGMoImxpYnJhcnlJRCIsImxpYnJhcnlOYW1lIildCmBgYAoKIyMgU2VhcmNoaW5nIGZvciBzaWduYXR1cmUgdXNpbmcgQlJPQUQgSUQKClNlYXJjaGluZyBmb3Igc2lnbmF0dXJlIGZvciBnaXZlbiB0ZXJtLiBJbiB0aGlzIGV4YW1wbGUgIkRpY2xvZmVuYWMiIGNvdW1wb3VuZCB3aWxsIGJlIHNob3duIGFzIGFuIGV4YW1wbGUuCgoqKlRlcm0gOioqIERpY2xvZmVuYWMKYGBge3J9CnRlcm0gPC0gIkRpY2xvZmVuYWMiCmFwaVVybCA8LSBwYXN0ZSgiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9TaWduYXR1cmVNZXRhL2ZpbmRUZXJtV2l0aFN5bm9ueW1zP3Rlcm09Iix0ZXJtLCImbGlicmFyeT1MSUJfNSIsc2VwPSIiKQpyZXEgPC0gR0VUKGFwaVVybCkKCmlsaW5jc19yZXN1bHQgPC0gbGFwcGx5KGh0dHI6OmNvbnRlbnQocmVxKSRkYXRhLHVubGlzdCkKaWxpbmNzX3Jlc3VsdF9kZjwtdChkYXRhLmZyYW1lKGxhcHBseShpbGluY3NfcmVzdWx0LGZ1bmN0aW9uKHgpIHsKICBpZihsZW5ndGgoeCk8MTgpeDwtYyh4LGlzX2V4YW1wbGFyPTApCiAgeH0pLHN0cmluZ3NBc0ZhY3RvcnMgPSBGKSkKcm93bmFtZXMoaWxpbmNzX3Jlc3VsdF9kZik8LU5VTEwKCmhlYWQoaWxpbmNzX3Jlc3VsdF9kZlssYygiY2VsbGxpbmUiLCJjb21wb3VuZCIsImNvbmNlbnRyYXRpb24iLCJzaWduYXR1cmVpZCIsImlzX2V4ZW1wbGFyIildKQpgYGAKCiNTZWxlY3RpbmcgYSBzaWduYXR1cmUgdG8gYW5hbHl6ZQoKYGBge3Igc2VsZWN0ZWRTaWduYXR1cmV9CmlsaW5jc19zaWduYXR1cmVJZCA8LSBpbGluY3NfcmVzdWx0X2RmWzEsInNpZ25hdHVyZWlkIl0KaWxpbmNzX3NpZ25hdHVyZUlkCmBgYAoKIyMgR2V0dGluZyBzaWduYXR1cmUgZGF0YSBhbmQgdnVsY2FubyBwbG90CiNUaGUgZmlyc3Qgc3RlcCBpcyB0byByZXRyaWV2ZSB0aGUgc2Vzc2lvbiBpZCBmb3IgY3JlYXRpb24gb2YgdGhlIHNpZ25hdHVyZSBkYXRhIHRhYmxlCmBgYHtyfQpyZXEgPC0gUE9TVCgiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL2Rvd25sb2FkU2lnbmF0dXJlIiwgYm9keSA9IGxpc3Qoc2lnSUQgPSBwYXN0ZShpbGluY3Nfc2lnbmF0dXJlSWQpKSwgZW5jb2RlID0gImpzb24iKQppbGluY3Nfc2Vzc2lvbklkPC11bmxpc3QoY29udGVudChyZXEpKQppbGluY3Nfc2Vzc2lvbklkCmBgYAoKIyBSZXRyaWV2aW5nIGRhdGEKYGBge3J9CmZpbGVVcmw9cGFzdGUoImh0dHA6Ly93d3cuaWxpbmNzLm9yZy90bXAvIixpbGluY3Nfc2Vzc2lvbklkLCIueGxzIixzZXA9IiIpCnNpZ25hdHVyZURhdGE8LXJlYWQudGFibGUoZmlsZVVybCxzZXA9Ilx0IixoZWFkZXI9VCxzdHJpbmdzQXNGYWN0b3JzID0gRikKaGVhZChzaWduYXR1cmVEYXRhKQpgYGAKCiMgSW5zZXJ0IHZvbGNhbm8gcGxvdApgYGB7cn0KYXBpVXJsIDwtIHBhc3RlKCJodHRwOi8vd3d3LmlsaW5jcy5vcmcvYXBpL2lsaW5jc1Ivdm9sY2Fub1Bsb3Q/ZmlsZT0iLGlsaW5jc19zZXNzaW9uSWQsIi54bHMiLHNlcD0iIikKcmVxIDwtIEdFVChhcGlVcmwpCmlsaW5jc192b2xjYW5vVXJsPC1wYXN0ZSgiaHR0cDovL3d3dy5pbGluY3Mub3JnIixjb250ZW50KHJlcSkkdXJsLHNlcD0iIikKa25pdHI6OmluY2x1ZGVfZ3JhcGhpY3MoaWxpbmNzX3ZvbGNhbm9VcmwpCmBgYAoKCiMjIEdldCBjb25uZWN0ZWQgc2lnbmF0dXJlcwoKaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9TaWduYXR1cmVNZXRhL2ZpbmRDb25jb3JkYW50U2lnbmF0dXJlcz9zaWdJRD1MSU5DU0tEXzEmbGliPUxJQl81CgojI0ZpbmQgZW5yaWNoZWQgc2lnbmF0dXJlcwpgYGB7cn0KZ2xpc3Q8LXBhc3RlKHNpZ25hdHVyZURhdGFbb3JkZXIoc2lnbmF0dXJlRGF0YSRTaWduaWZpY2FuY2VfcHZhbHVlKVsxOjEwMF0sIk5hbWVfR2VuZVN5bWJvbCJdLGNvbGxhcHNlID0gIiwiKQpnbGlzdAoKYGBge3J9CmFwaVVybCA8LSAiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL0dlbmVMaXN0RW5yaWNobWVudCIKcmVxIDwtIFBPU1QoYXBpVXJsLCBib2R5ID0gbGlzdChnZW5lTGlzdD1nbGlzdCwgbGliTmFtZT0iTElCXzUiKSwgZW5jb2RlID0gImZvcm0iKQpjb25uZWN0ZWRTaWduYXR1cmVzIDwtIGRhdGEudGFibGU6OnJiaW5kbGlzdChjb250ZW50KHJlcSksIHVzZS5uYW1lcyA9IFRSVUUsIGZpbGwgPSBUUlVFKQoKaGVhZChjb25uZWN0ZWRTaWduYXR1cmVzKQpgYGAKIyMgR2V0IGNvbm5lY3RlZCBwZXJ0dXJiYXRpb25zCgpodHRwOi8vd3d3LmlsaW5jcy5vcmcvYXBpL2lsaW5jc1Ivc2lnbmF0dXJlRW5yaWNobWVudD9zaWdGaWxlPXNpZ19UdWVfTm92XzI3XzEzXzIxXzM2XzIwMThfOTAwNzMzMS54bHMmbGlicmFyeT1MSUJfNQoKIyMgR2V0IGNvbm5lY3RlZCBwZXJ0dXJiYXRpb25zCgpodHRwOi8vd3d3LmlsaW5jcy5vcmcvYXBpL2lsaW5jc1Ivc2lnbmF0dXJlRW5yaWNobWVudD9zaWdGaWxlPXNpZ19UdWVfTm92XzI3XzEzXzIxXzM2XzIwMThfOTAwNzMzMS54bHMmbGlicmFyeT1MSUJfNQoKIyMgR2V0IGNvcnJlbGF0aW9uIHBsb3QKaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL2NvcnJlbGF0aW9uUGxvdD9zaWdJRD1MSU5DU0NQXzEwMjcwJnNpZ0ZpbGU9c2lnX1R1ZV9Ob3ZfMjdfMTNfMjFfMzZfMjAxOF85MDA3MzMxLnhscwoKYGBge3IgY29ycmVsYXRpb24gcGxvdH0KIyBhcGlVcmwgPC0gImh0dHA6Ly93d3cuaWxpbmNzLm9yZy9hcGkvaWxpbmNzUi9jb3JyZWxhdGlvblBsb3Q/c2lnSUQ9TElOQ1NDUF8xMDI3MCZzaWdGaWxlPXNpZ19UdWVfTm92XzI3XzEzXzIxXzM2XzIwMThfOTAwNzMzMS54bHMiCiMgIyByZXEgPC0gR0VUKGFwaVVybCkKIyAjIGpzb24gPC0gaHR0cjo6Y29udGVudChyZXEsIGFzID0gInRleHQiKQojICMganNvbiA8LSBmcm9tSlNPTihhcGlVcmwpCiMgIyBhbGwuZXF1YWwocGxvdCwgdG9KU09OKGZyb21KU09OKGFwaVVybCkpKQojIGpzb24gPC0gdG9KU09OKGZyb21KU09OKGFwaVVybCkpCiMgcHJldHRpZnkoanNvbikKIyBjbGFzcyhqc29uKQojICMgcGxvdGx5X2J1aWxkKGpzb24pCiMgIyBleHBsb3JlUGxvdCA9IHBsb3RseV9qc29uKGZyb21KU09OKGpzb24pKQojICMgcGxvdGx5X2J1aWxkKGV4cGxvcmVQbG90KQojICMgIyBjb3JyZWxhdGlvbl9wbG90IDwtIGZyb21KU09OKGpzb24pCiMgIyBjb3JyZWxhdGlvbl9wbG90CmFwaVVybCA8LSAiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL2NvcnJlbGF0aW9uUGxvdD9zaWdJRD1MSU5DU0NQXzEwMjcwJnNpZ0ZpbGU9c2lnX1R1ZV9Ob3ZfMjdfMTNfMjFfMzZfMjAxOF85MDA3MzMxLnhscyZvdXRwdXQ9d2lkZ2V0IgpyZXEgPC0gR0VUKGFwaVVybCkKY29yclBsb3RVcmwgPC0gY29udGVudChyZXEpJHVybApjb3JyUGxvdFVybAojIGh0bWx0b29sczo6aW5jbHVkZUhUTUwoY29yclBsb3RVcmwpCgojIHJtYXJrZG93bjo6YWxsX291dHB1dF9mb3JtYXRzKGtuaXRyOjpjdXJyZW50X2lucHV0KCkpCiMgaWYgKCJodG1sX2RvY3VtZW50IiAlaW4lIHJtYXJrZG93bjo6YWxsX291dHB1dF9mb3JtYXRzKGtuaXRyOjpjdXJyZW50X2lucHV0KCkpKSB7CmlmKGdldE91dHB1dEZvcm1hdCgpID09ICdodG1sX2RvY3VtZW50JykgewogIGluY2x1ZGVfdXJsKGNvcnJQbG90VXJsLCBoZWlnaHQgPSAiNjgwcHgiKQp9IGVsc2UgewogIHByaW50KCJvdXRwdXQgaXMgbm90IEhUTUwiKQogIHByaW50KGdldE91dHB1dEZvcm1hdCgpKQogIGNvcnJQbG90VXJsCn0KYGBgCgojIyBHZXQgR1NFQSBwbG90CmBgYHtyIEdTRUF9CmFwaVVybCA8LSAiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL3Bsb3RHU0VBIgpyZXEgPC0gUE9TVChhcGlVcmwsIGJvZHkgPSBsaXN0KHNpZ25hdHVyZUlkID0gcGFzdGUoaWxpbmNzX3NpZ25hdHVyZUlkKSxnZW5lcyA9IGMoNTE0NzQsNzExMiw4NTcwLDU1NDIxLDI4MzMzNyw1NDM4Niw1MjE0LDc5ODk0LDYxMzYsNTUxNCw1MTcwLDYxOTcsMjMyMSksIG91dHB1dD0id2lkZ2V0IiksIGVuY29kZSA9ICJqc29uIikKZ3NlYVBsb3RVcmwgPC0gY29udGVudChyZXEpCmdzZWFQbG90VXJsCiMgaHRtbHRvb2xzOjppbmNsdWRlSFRNTChjb3JyUGxvdFVybCkKCgojIGlmICgiaHRtbCIgJWluJSBybWFya2Rvd246OmFsbF9vdXRwdXRfZm9ybWF0cyhrbml0cjo6Y3VycmVudF9pbnB1dCgpKSkgewojICAgaW5jbHVkZV91cmwoZ3NlYVBsb3RVcmwsIGhlaWdodCA9ICI2ODBweCIpCiMgfSBlbHNlIHsKIyAgIGdzZWFQbG90VXJsCiMgfQpgYGAKCiMjIFJldHJpdmluZyBTaWduYXR1cmUgTWV0YWRhdGEKYGBge3J9CmFwaVVybCA8LSBwYXN0ZSgiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9TaWduYXR1cmVNZXRhLyIsaWxpbmNzX3NpZ25hdHVyZUlkLHNlcD0iIikKcmVxIDwtIEdFVChhcGlVcmwpCmwgPC0gbGFwcGx5KGNvbnRlbnQocmVxKSwgZnVuY3Rpb24oeCkgdW5saXN0KHgpKQppbGluY3NfcmVzdWx0IDwtIGRhdGEuZnJhbWUodChzYXBwbHkobCxjKSkpCmtuaXRyOjprYWJsZSh0KGlsaW5jc19yZXN1bHQpKQpgYGAKCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiaUxJTkNTIEFQSSBSIE5vdGVib29rIgpvdXRwdXQ6CiAgaHRtbF9kb2N1bWVudDoKICAgIGRmX3ByaW50OiBwYWdlZAogIGh0bWxfbm90ZWJvb2s6IGRlZmF1bHQKICB3b3JkX2RvY3VtZW50OiBkZWZhdWx0CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0Ci0tLQoKPCEtLSAjIyBQcmVyZXF1aXNpdGVzICAtLT4KCmBgYHtyIGluY2x1ZGUgPSBGQUxTRX0KbGlicmFyeShrbml0cikKbGlicmFyeSh0aW55dGV4KQpsaWJyYXJ5KGh0dHIpCmxpYnJhcnkoanNvbmxpdGUpCmxpYnJhcnkocGxvdGx5KQpsaWJyYXJ5KGh0bWx0b29scykKCmBgYAoKI1NlbGVjdGluZyBhIHNpZ25hdHVyZSB0byBhbmFseXplCgpgYGB7ciBzZWxlY3RlZFNpZ25hdHVyZX0KaWxpbmNzX3NpZ25hdHVyZUlkIDwtICJMSU5DU0NQXzEwMCIKaWxpbmNzX3NpZ25hdHVyZUlkCmBgYAoKIyMgR2V0dGluZyBzaWduYXR1cmUgZGF0YSBhbmQgdnVsY2FubyBwbG90CiNUaGUgZmlyc3Qgc3RlcCBpcyB0byByZXRyaWV2ZSB0aGUgc2Vzc2lvbiBpZCBmb3IgY3JlYXRpb24gb2YgdGhlIHNpZ25hdHVyZSBkYXRhIHRhYmxlCmBgYHtyfQpyZXEgPC0gUE9TVCgiaHR0cDovL3d3dy5pbGluY3Mub3JnL2FwaS9pbGluY3NSL2Rvd25sb2FkU2lnbmF0dXJlIiwgYm9keSA9IGxpc3Qoc2lnSUQgPSBwYXN0ZShpbGluY3Nfc2lnbmF0dXJlSWQpKSwgZW5jb2RlID0gImpzb24iKQppbGluY3Nfc2Vzc2lvbklkPC11bmxpc3QoY29udGVudChyZXEpKQppbGluY3Nfc2Vzc2lvbklkCmBgYAoKIyBSZXRyaWV2aW5nIGRhdGEKYGBge3J9CmZpbGVVcmw9cGFzdGUoImh0dHA6Ly93d3cuaWxpbmNzLm9yZy90bXAvIixpbGluY3Nfc2Vzc2lvbklkLCIueGxzIixzZXA9IiIpCnNpZ25hdHVyZURhdGE8LXJlYWQudGFibGUoZmlsZVVybCxzZXA9Ilx0IixoZWFkZXI9VCxzdHJpbmdzQXNGYWN0b3JzID0gRikKaGVhZChzaWduYXR1cmVEYXRhKQpgYGAKIyNGaW5kIGVucmljaGVkIHNpZ25hdHVyZXMKYGBge3J9CmdsaXN0PC1wYXN0ZShzaWduYXR1cmVEYXRhW29yZGVyKHNpZ25hdHVyZURhdGEkU2lnbmlmaWNhbmNlX3B2YWx1ZSlbMToxMDBdLCJOYW1lX0dlbmVTeW1ib2wiXSxjb2xsYXBzZSA9ICIsIikKZ2xpc3QKCmBgYHtyfQphcGlVcmwgPC0gImh0dHA6Ly93d3cuaWxpbmNzLm9yZy9hcGkvaWxpbmNzUi9HZW5lTGlzdEVucmljaG1lbnQiCnJlcSA8LSBQT1NUKGFwaVVybCwgYm9keSA9IGxpc3QoZ2VuZUxpc3Q9Z2xpc3QsIGxpYk5hbWU9IkxJQl81IiksIGVuY29kZSA9ICJmb3JtIikKY29ubmVjdGVkU2lnbmF0dXJlcyA8LSBkYXRhLnRhYmxlOjpyYmluZGxpc3QoY29udGVudChyZXEpLCB1c2UubmFtZXMgPSBUUlVFLCBmaWxsID0gVFJVRSkKCmhlYWQoY29ubmVjdGVkU2lnbmF0dXJlcykKYGBgCg==</div>
 
 
 

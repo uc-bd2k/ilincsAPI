@@ -98,11 +98,14 @@ http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1
 ##Find enriched signatures
 ```{r}
 glist<-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],"Name_GeneSymbol"],collapse = ",")
+glist
+
+```{r}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/GeneListEnrichment"
 req <- POST(apiUrl, body = list(geneList=glist, libName="LIB_5"), encode = "form")
 connectedSignatures <- data.table::rbindlist(content(req), use.names = TRUE, fill = TRUE)
 
-head(output)
+head(connectedSignatures)
 ```
 ## Get connected perturbations
 
