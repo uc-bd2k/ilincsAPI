@@ -1,0 +1,37 @@
+---
+title: "ilincs signature creation with a gene list examples"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+require(httr)
+require(jsonlite)
+# This is the general pipeline
+glist <- "51474,7112,8570,55421,283337,54386,5214,79894,6136,5514,5170,6197,23215,9221,23074,151195,84901,23185,7916,91833,5062,54187,9775,23131,10746,6195,673,5339,2194,5977,222229,51530,1859,983,51773,79039,9612,22794,3727,80232,10250,8520,5930,10006,8021,6599,6885,54940,24137,283489,8449,63893,9967,79882,84991,64855,7114,54443,79026,4134,128239,2355,143684,29028,84126,22974,11276,10432,23476,55425,30011,2011,23524,57532,57679,51322,11273,51155,254225,23313,1211,9730,81539,8408,6194,26155,8350,3020,2099,3485,5241,6198,4609,29968,2625,857,3725,1432,1116,25937,6774,367,7249,5727,84441,891,163882,5728,572,31,5578,1956,1312,898,2475,5562,9134,4904,3925,7011,5111,7178,10892,2309,8028,2178,2120,1291,7157,2064,1000,920,3815,5054,5371,595,2175,1289,2263,2335,6794,57535,1017,142,5604,1499,2019,3480,2934,999,57111,2260,6901,10413,675,221895,5599,64783,7534,5290,6778,672,1026,4629,54763,931,7153,823,1465,1645,3006,3181,3909,5440,6542,6713,7165,7867,7915,9314,9703,9710,10628,11182,51070,55315,56924,56994,57761,79415,79961,84273,84909,203068"
+
+myurl <- "http://www.ilincs.org/api/ilincsR/LincsDataAnalysis"
+res <- content(POST(myurl, body = list(exp="EDS-1014", prop="ER", filterchk="ER:+,,,ER:-", includeORexclude=1, geneList=glist), encode = "form"))
+
+signature <- data.table::rbindlist(res$signature, use.names = TRUE, fill = TRUE)
+head(signature)
+cat("\n")
+dim(signature)
+sigFile <- paste0("completeSig_", res$sessionID, ".xls")
+cat("\n\n signature file is:" , sigFile, "\n")
+
+
+cat("\n", "Information retrievable for this signature", "\n")
+names(res)
+
+```
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
