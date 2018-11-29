@@ -17,6 +17,35 @@ library(jsonlite)
 library(plotly)
 ```
 
+### List of LINCS Datasets
+```{r}
+apiUrl <- "http://www.ilincs.org/api/PublicDatasets/getDatasets?lincs=true"
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+lincs_datasets <- fromJSON(json)
+lincsDatasets <- data.frame(lincs_datasets$data)
+lincsDatasets[c("experiment","assay","dataType")]
+```
+
+
+### Dataset metadata
+
+**Example:** EDS-1014  
+```{r}
+experiment <- "EDS-1014"
+
+apiUrl <- paste("http://www.ilincs.org/api/PublicDatasets/",experiment,sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+datasetMetaData <- fromJSON(json)
+# datasetMetaData <- data.frame(datasetMeta)
+datasetMetaData
+```
+
+### Dataset sample metadata
+http://www.ilincs.org/api/ilincsR/getSamples?id=EDS-1014
+
+
 ### Heatmap
 
 ```{r, out.width="910px"}

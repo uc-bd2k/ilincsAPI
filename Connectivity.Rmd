@@ -52,7 +52,7 @@ apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?te
 req <- GET(apiUrl)
 ilincs_result <- httr::content(req)$data
 # ilincs_result[[1]]
-knitr::kable(t(ilincs_result[[1]]))
+# knitr::kable(t(ilincs_result[[1]]))
 ```
 
 Extracting signature ID of the signature with the highest connectivity
@@ -62,6 +62,7 @@ ilincs_signatureId <- ilincs_result[[1]]$signatureid
 ilincs_signatureId
 ```
 
+[`r ilincs_signatureId` signature page on iLINCS](http://www.ilincs.org/ilincs/signature/`r ilincs_signatureId`)
 
 ## Retriving Signature Metadata
 ```{r}
@@ -76,25 +77,29 @@ knitr::kable(t(ilincs_result))
 ```{r}
 class(paste(ilincs_signatureId))
 
-r <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId)), encode = "json")
-l <- lapply(content(r), function(x) unlist(x))
-ilincs_result <- data.frame(t(sapply(l,c)))
-knitr::kable(t(ilincs_result))
-ilincs_sessionId <- ilincs_result$data
-ilincs_sessionId
+r <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId),display = TRUE), encode = "json")
+# l <- lapply(content(r), function(x) unlist(x))
+# ilincs_result <- data.frame(t(sapply(l,c)))
+# knitr::kable(t(ilincs_result))
+ilincs_result <- content(r)$data
+ilincs_sessionId <- ilincs_result$fileName
+l <- lapply(ilincs_result$signature, function(x) unlist(x))
+ilincs_signatureData <- data.frame(t(sapply(l,c)))
+# ilincs_signatureData
+ilincs_signatureData$Value_LogDiffExp <- as.numeric(as.character(ilincs_signatureData$Value_LogDiffExp))
+ilincs_signatureData$Significance_pvalue <- as.numeric(as.character(ilincs_signatureData$Significance_pvalue))
+ilincs_signatureData[order(ilincs_signatureData$Significance_pvalue) , ]
 ```
 
 ## Getting volcano plot
 ```{r}
 apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
-apiUrl
-r <- GET(apiUrl)
-l <- lapply(content(r), function(x) unlist(x))
+req <- GET(apiUrl)
+l <- lapply(content(req), function(x) unlist(x))
 ilincs_result <- data.frame(t(sapply(l,c)))
-knitr::kable(t(ilincs_result))
 ilincs_volcanoUrl <- ilincs_result$url
 ilincs_volcanoUrl <- paste("http://www.ilincs.org",ilincs_volcanoUrl,sep="")
-ilincs_volcanoUrl
+# ilincs_volcanoUrl
 ```
 
 ```{r echo=FALSE, out.width='100%'}
@@ -107,16 +112,20 @@ include_graphics('volcano.png')
 
 http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&lib=LIB_5
 
-## Get connected perturbations
-
-http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
-
-## Get connected perturbations
-
-http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
+```{r}
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=LIB_6",sep="")
+req <- GET(apiUrl)
+apiUrl
+json <- httr::content(req, as = "text")
+ilincs_connectedSignatures <- fromJSON(json)
+ilincs_connectedSignatures$similarity <- as.numeric(as.character(ilincs_connectedSignatures$similarity))
+ordered_connectedSignatures <- ilincs_connectedSignatures[order(ilincs_connectedSignatures$similarity) , ]
+most_discordant_signature <- ordered_connectedSignatures[1,"signatureid"]
+most_discordant_signature
+```
 
 ## Get correlation plot
-http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls
+<!-- http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls -->
 
 ```{r correlation plot}
 # apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls"
@@ -132,7 +141,8 @@ http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=si
 # # plotly_build(explorePlot)
 # # # correlation_plot <- fromJSON(json)
 # # correlation_plot
-apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&output=widget"
+# apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&output=widget"
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=",most_discordant_signature,"&sigFile=",ilincs_sessionId,".xls&output=widget",sep="")
 req <- GET(apiUrl)
 corrPlotUrl <- content(req)$url
 corrPlotUrl
@@ -149,20 +159,24 @@ if(getOutputFormat() == 'html_document') {
 }
 ```
 
+
+## Get connected perturbations
+
+http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
+
+## Get connected perturbations
+
+http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
+
 ## Get GSEA plot
 ```{r GSEA}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
-req <- POST(apiUrl, body = list(signatureId = paste(ilincs_signatureId),genes = c(51474,7112,8570,55421,283337,54386,5214,79894,6136,5514,5170,6197,2321), output="widget"), encode = "json")
-gseaPlotUrl <- content(req)
+req <- POST(apiUrl, body = list(signatureId = paste(ilincs_signatureId),genes = c(51474,7112,8570,55421,283337,54386,5214,79894,6136,5514,5170,6197,2321), output="png"), encode = "json")
+gseaPlotPng <- content(req)$fileName
+gseaPlotUrl <- paste("http://www.ilincs.org/tmp/",gseaPlotPng,".png",sep="")
 gseaPlotUrl
-# htmltools::includeHTML(corrPlotUrl)
-
-
-# if ("html" %in% rmarkdown::all_output_formats(knitr::current_input())) {
-#   include_url(gseaPlotUrl, height = "680px")
-# } else {
-#   gseaPlotUrl
-# }
+download.file(gseaPlotUrl,'GSEA.png', mode = 'wb')
+include_graphics('GSEA.png')
 ```
 
 
