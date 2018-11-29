@@ -1,0 +1,30 @@
+---
+title: "ilincs signature enrichment examples"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+require(httr)
+require(jsonlite)
+
+glist <- "LIMA1,TMPO,KHSRP,C17orf85,ZNF740,TERF2IP,PFKP,ZNF672,RPL12,PPP1R10,PDPK1,RPS6KA3,PRRC2C,NOLC1,UHRF1BP1L,CCNYL1,NFATC2IP,LARP4B,PRRC2A,WDR20,PAK2,NANS,EIF4A3,GPATCH8,MAP3K2,RPS6KA1,BRAF,PLEC,FASN,DPF2,LRWD1,ZC3HC1,DYRK1A,CDK1,RSF1,DDX54,NCOR2,CASC3,JUND,WDR26,SRRM1,HAT1,RBBP6,ABI1,NUP214,SMARCC1,MAP3K7,OCIAD1,KIF4A,CHAMP1,DHX16,UBE2O,THRAP3,ZC3H14,RBM17,FAM129B,TMSB4X,ANLN,AHNAK,MAP4,IQGAP3,FOSL2,FAM76B,ATAD2,ATRIP,TPX2,SYNRG,RBM14,BRD4,GPALPP1,SH3KBP1,MARK2,SRRM2,NUFIP2,ALS2,WAC,ATXN2L,HN1,RNF169,KIAA0930,CLTA,VPRBP,SLC38A1,ULK1,RPS6,NOC2L,HIST1H3A,H3F3A,ESR1,IGFBP2,PGR,RPS6KB1,MYC,PSAT1,GATA3,CAV1,JUN,MAPK14,CHI3L1,WWTR1,STAT3,AR,TSC2,PTCH1,MAML2,CCNB1,CNST,PTEN,BAD,ACACA,PRKCA,EGFR,COMT,CCNE1,MTOR,PRKAA1,CCNE2,YBX1,STMN1,TEP1,PCNA,TPT1,MALT1,FOXO3,MLLT10,FANCE,ETV6,COL6A1,TP53,ERBB2,CDH2,CD4,KIT,SERPINE1,PML,CCND1,FANCA,COL5A1,FGFR2,FN1,STK11,KIAA1324,CDK2,PARP1,MAP2K1,CTNNB1,EN1,IGF1R,GSN,CDH1,RAB25,FGFR1,TAZ,YAP1,BRCA2,JAZF1,MAPK8,RBM15,YWHAZ,PIK3CA,STAT6,BRCA1,CDKN1A,MYH11,ROPN1,MS4A1,TOP2A,CAPN1,CSRP1,AKR1C1,HIST1H1C,HNRNPA2B1,LAMA3,POLR2K,SLC7A2,SQLE,TPD52L2,MAPKAPK3,ALDH5A1,KLF4,KIAA0100,KIAA0355,TXNIP,SLC2A6,NOSIP,SLC29A3,PAK6,CHPT1,TRIB3,C17orf62,DENND2D,NOA1,C9orf3,TUBB"
+ 
+myurl <- "http://www.ilincs.org/api/ilincsR/GeneListEnrichment"
+res <- POST(myurl, body = list(geneList=glist, libName="LIB_6"), encode = "form")
+output <- data.table::rbindlist(content(res), use.names = TRUE, fill = TRUE)
+
+head(output)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
