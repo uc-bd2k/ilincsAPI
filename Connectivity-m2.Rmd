@@ -51,12 +51,7 @@ term <- "Diclofenac"
 apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,"&library=LIB_5",sep="")
 req <- GET(apiUrl)
 
-ilincs_result <- lapply(httr::content(req)$data,unlist)
-ilincs_result_df<-t(data.frame(lapply(ilincs_result,function(x) {
-  if(length(x)<18)x<-c(x,is_examplar=0)
-  x}),stringsAsFactors = F))
-rownames(ilincs_result_df)<-NULL
-
+ilince_result_df<-fromJSON(httr::content(req,type="text"))$data
 head(ilincs_result_df[,c("cellline","compound","concentration","signatureid","is_exemplar")])
 ```
 
