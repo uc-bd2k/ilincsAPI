@@ -14,6 +14,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 require(httr)
 require(jsonlite)
 # Assuming this file is created in the previous step
+# This is the general pipeline
 sigFile <- "completeSig_Thu_Nov_29_13_21_06_2018_15725.xls"
  
 myurl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
