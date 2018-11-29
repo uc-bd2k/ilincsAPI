@@ -15,5 +15,5 @@
 ## Signature from dataset R markdown
 [Signature from dataset R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/SignatureFromDataset.Rmd)
 
-## Enrichment HTML output
+## Signature from dataset HTML output
 [Signature from dataset HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/SignatureFromDataset.html)
