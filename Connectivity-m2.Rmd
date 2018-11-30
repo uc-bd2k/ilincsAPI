@@ -52,7 +52,7 @@ ilincs_signatureId
 ```
 
 ## Getting signature data and vulcano plot
-#The first step is to retrieve the session id for creation of the signature data table
+###The first step is to retrieve the session id for creation of the signature data table
 ```{r}
 req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId)), encode = "json")
 ilincs_sessionId<-unlist(content(req))
@@ -60,14 +60,14 @@ ilincs_sessionId
 ```
 
 # Retrieving data
-```{r}
+```{r volcano data}
 fileUrl=paste("http://www.ilincs.org/tmp/",ilincs_sessionId,".xls",sep="")
 signatureData<-read.table(fileUrl,sep="\t",header=T,stringsAsFactors = F)
 head(signatureData)
 ```
 
 # Insert volcano plot
-```{r}
+```{r volcano plot}
 apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
 req <- GET(apiUrl)
 ilincs_volcanoUrl<-paste("http://www.ilincs.org",content(req)$url,sep="")
@@ -76,7 +76,7 @@ knitr::include_graphics(ilincs_volcanoUrl)
 
 
 ## Get connected signatures
-```{r}
+```{r connected signatures}
 apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=",ilincs_libId,sep="")
 req <- GET(apiUrl)
 # prettify(content(req,type="text"))
@@ -86,12 +86,12 @@ head(ilincs_conn_df)
 #Find LINCS signatures connected to user a submitted signature
 #User submitted signature in the form of a gene list
 Create a gene list from Diclofenac signature
-```{r}
+```{r query gene list}
 glist<-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],"Name_GeneSymbol"],collapse = ",")
 glist
 ```
 Submit the list to iLINCS. In this case, iLINCS performs random set enrichment analysis  
-```{r}
+```{r connected via gene list}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/GeneListEnrichment"
 req <- POST(apiUrl, body = list(geneList=glist, libName="LIB_5"), encode = "form")
 connectedSignatures<-fromJSON(httr::content(req,type="text"))
