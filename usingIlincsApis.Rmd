@@ -83,7 +83,32 @@ req <- GET(apiUrl)
 ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
 head(ilincs_conn_df)
 ```
-#Find LINCS signatures connected to user a submitted signature
+##Find LINCS signatures connected to user a submitted signature
+If using a local signature file an extra processing step is needed
+```{r}
+require(httr)
+require(jsonlite)
+
+# This is the general pipeline for both local and on the server files
+local <- TRUE
+sigFile <- "path/to/your/signature/file/sample1.csv"                    # example for local file (csv/tsv/txt), then local <- TRUE
+# sigFile <- "processedSig_Fri_Nov_30_12_16_30_2018_4598599.xls"        # example for file on the server,       then local <- FALSE
+libName <- "LIB_6" # knock down library
+
+if(local) {
+  processFile <- content(POST("http://www.ilincs.org/api/SignatureMeta/upload", body = list(file = upload_file(sigFile))))
+  signatureFile <- processFile$status$fileName[[1]]
+} else {
+  signatureFile <- sigFile
+}
+
+apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
+req <- content(POST(apiUrl, body = list(file=signatureFile, lib="LIB_6", path="/mnt/raid/tmp/"), encode = "form"))
+output <- data.table::rbindlist(res$concordanceTable, use.names = TRUE, fill = TRUE)
+output <- output[,c("signatureid", "perturbagenID", "treatment", "cellline", "time", "similarity", "pValue", "nGenes")]
+head(output)
+```
+
 #User submitted signature in the form of a gene list
 Create a gene list from Diclofenac signature
 ```{r query gene list}
