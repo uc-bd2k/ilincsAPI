@@ -75,8 +75,7 @@ knitr::kable(t(ilincs_result))
 
 ## Downloading signature data
 ```{r}
-class(paste(ilincs_signatureId))
-
+# class(paste(ilincs_signatureId))
 r <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId),display = TRUE), encode = "json")
 # l <- lapply(content(r), function(x) unlist(x))
 # ilincs_result <- data.frame(t(sapply(l,c)))
@@ -159,6 +158,28 @@ if(getOutputFormat() == 'html_document') {
 }
 ```
 
+## Group analysis of top 20 most connected signatures with signature of interest
+```{r signature group analysis}
+most_concordant_20signatures <- ilincs_connectedSignatures[1:20,"signatureid"]
+signaturesForGroupAnalysis21 <- c(ilincs_signatureId,most_concordant_20signatures)
+r <- POST("http://www.ilincs.org/api/ilincsR/GroupLincsAnalysis", body = list(idList = signaturesForGroupAnalysis21,noOfGenes = 50), encode = "json")
+ilincs_result <- content(r)$data
+groupAnalysisSessionID <- ilincs_result[[2]]
+groupAnalysisSessionID
+```
+### [Signature group heatmap on iLINCS](http://www.ilincs.org/apps/heatmap/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
+
+```{r, out.width="910px"}
+heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",groupAnalysisSessionID,"&property=signatureID&geneCount=100",sep = "")
+include_url(heatmap_url, height = "900px")
+```
+
+### [Signature group PCA and tSNE app on iLINCS](http://www.ilincs.org/apps/pca/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
+
+```{r, out.width="910px"}
+pca_url<-paste("http://www.ilincs.org/apps/pca/?sessionID=",groupAnalysisSessionID,"&property=signatureID&geneCount=100",sep = "")
+include_url(pca_url, height = "900px")
+```
 
 ## Get connected perturbations
 
