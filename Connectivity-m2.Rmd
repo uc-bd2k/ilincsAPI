@@ -90,7 +90,8 @@ knitr::include_graphics(ilincs_volcanoUrl)
 
 http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&lib=LIB_5
 
-##Find enriched signatures
+#Fing connected signatures
+#Find connected signatures based on user submitted gene list
 ```{r}
 glist<-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],"Name_GeneSymbol"],collapse = ",")
 glist
@@ -98,9 +99,28 @@ glist
 ```{r}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/GeneListEnrichment"
 req <- POST(apiUrl, body = list(geneList=glist, libName="LIB_5"), encode = "form")
+connectedSignatures<-fromJSON(httr::content(req,type="text"))
+
 connectedSignatures <- data.table::rbindlist(content(req), use.names = TRUE, fill = TRUE)
 
 head(connectedSignatures)
+```
+#Find connected signatures based on user submitted gene list
+Save previously downloaded data file
+```{r}
+write.table(signatureData,file="sigFile.tsv",sep="\t",row.names=F,col.names = T,quote=F)
+system(paste("head sigFile.tsv"))
+
+Submit the file to api
+```{r}
+sigFile <- "sigFile.tsv"
+sigFile<-"signatureData.xls"
+apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
+req <- (POST(apiUrl, body = list(file=sigFile, lib="LIB_6", path="~/git/ilincsAPI/"), encode = "form"))
+output <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+# output <- output[,c("signatureid", "perturbagenID", "treatment", "cellline", "time", "similarity", "pValue", "nGenes")]
+head(output)
+```
 ```
 ## Get connected perturbations
 
