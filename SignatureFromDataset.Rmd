@@ -62,7 +62,7 @@ sampleMetaData
 [Create signature from dataset `r experiment` on iLINCS](http://www.ilincs.org/ilincs/dataset/`r experiment`/createSignature)
 
 ##Creating signature using iLINCS API
-```{r GSEA}
+```{r Created Signature}
 property <- "ER"
 level1 <- "ER:+"
 level2 <- "ER:-"
@@ -76,21 +76,39 @@ createdSignaturesSessionID
 # include_graphics('GSEA.png')
 ```
 
+##Top 100 genes in created signature
+```{r top 100 genes in signature}
+# signatureData <- as.data.frame(content(req)$geneData)
+# signatureData
+l <- lapply(content(req)$geneData, function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+# ilincs_result
+top100signatureData <- ilincs_result[1:100,c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+top100signatureData
+```
 
 ### Heatmap
 
 ```{r, out.width="910px"}
 heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",createdSignaturesSessionID,"&property=",property,"&geneCount=100",sep = "")
 include_url(heatmap_url, height = "900px")
-# include_url("http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100", height = "900px")
-# htmltools::includeHTML("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100' target='_blank'>Heatmap</a>")
-# knit_print("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100'>abc</a>")
-# normal_print("<a href='http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100'>abc</a>")
-# cat("[Region:](www.somewebsite.com)")
-# heatmap_url<-"http://www.ilincs.org/apps/heatmap/?sessionID=Wed_Nov_28_14_02_36_2018_3471356&property=CK14&geneCount=100"
 ```
 
 <!-- ### `r heatmap_url` -->
 
 ####[Heatmap in iLINCS](`r heatmap_url`)
 
+<!-- ## Getting volcano plot -->
+```{r echo=FALSE}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=completeSig_",createdSignaturesSessionID,".xls",sep="")
+# volcanoPlot is not reading completeSig_ files to many columns
+# req <- GET(apiUrl)
+# l <- lapply(content(req), function(x) unlist(x))
+# ilincs_result <- data.frame(t(sapply(l,c)))
+# ilincs_volcanoUrl <- ilincs_result$url
+# ilincs_volcanoUrl <- paste("http://www.ilincs.org",ilincs_volcanoUrl,sep="")
+```
+```{r echo=FALSE, out.width='100%'}
+# download.file(ilincs_volcanoUrl,'volcano.png', mode = 'wb')
+# include_graphics('volcano.png')
+```
