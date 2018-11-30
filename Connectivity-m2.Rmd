@@ -17,17 +17,6 @@ library(httr)
 library(jsonlite)
 library(plotly)
 library(htmltools)
-
-getOutputFormat <- function() {
-  output <- rmarkdown:::parse_yaml_front_matter(
-    readLines(knitr::current_input())
-    )$output
-  if (is.list(output)){
-    return(names(output)[1])
-  } else {
-    return(output[1])
-  }
-}
 ```
 
 
@@ -42,16 +31,16 @@ ilincs_libraries[,c("libraryID","libraryName")]
 ```
 
 ## Searching for signature using BROAD ID
-
 Searching for signature for given term. In this example "Diclofenac" coumpound will be shown as an example.
 
-**Term :** Diclofenac
 ```{r}
 term <- "Diclofenac"
-apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,"&library=LIB_5",sep="")
+ilincs_libId<-"LIB_5"
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,"&library=",ilincs_libId,sep="")
 req <- GET(apiUrl)
 
-ilince_result_df<-fromJSON(httr::content(req,type="text"))$data
+ilincs_result_df<-fromJSON(httr::content(req,type="text"))$data
+# head(ilincs_result_df)
 head(ilincs_result_df[,c("cellline","compound","concentration","signatureid","is_exemplar")])
 ```
 
@@ -87,29 +76,46 @@ knitr::include_graphics(ilincs_volcanoUrl)
 
 
 ## Get connected signatures
-
-http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=LINCSKD_1&lib=LIB_5
-
-#Fing connected signatures
-#Find connected signatures based on user submitted gene list
+```{r}
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=",ilincs_libId,sep="")
+req <- GET(apiUrl)
+# prettify(content(req,type="text"))
+ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
+head(ilincs_conn_df)
+```
+#Find LINCS signatures connected to user a submitted signature
+#User submitted signature in the form of a gene list
+Create a gene list from Diclofenac signature
 ```{r}
 glist<-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],"Name_GeneSymbol"],collapse = ",")
 glist
-
+```
+Submit the list to iLINCS. In this case, iLINCS performs random set enrichment analysis  
 ```{r}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/GeneListEnrichment"
 req <- POST(apiUrl, body = list(geneList=glist, libName="LIB_5"), encode = "form")
 connectedSignatures<-fromJSON(httr::content(req,type="text"))
-
-connectedSignatures <- data.table::rbindlist(content(req), use.names = TRUE, fill = TRUE)
-
 head(connectedSignatures)
 ```
+
+## Get GSEA plot
+```{r GSEA}
+apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
+geneids<-signatureData[order(signatureData$Significance_pvalue)[1:100],"ID_geneid"]
+
+req <- POST(apiUrl, body = list(signatureId = ilincs_signatureId,genes = geneids, output="png"), encode = "json")
+gseaPlotPng <- content(req)$fileName
+gseaPlotUrl <- paste("http://www.ilincs.org/tmp/",gseaPlotPng,".png",sep="")
+include_graphics(gseaPlotUrl)
+```
+
+##This is not working
 #Find connected signatures based on user submitted gene list
 Save previously downloaded data file
 ```{r}
 write.table(signatureData,file="sigFile.tsv",sep="\t",row.names=F,col.names = T,quote=F)
 system(paste("head sigFile.tsv"))
+```
 
 Submit the file to api
 ```{r}
@@ -121,7 +127,6 @@ output <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE,
 # output <- output[,c("signatureid", "perturbagenID", "treatment", "cellline", "time", "similarity", "pValue", "nGenes")]
 head(output)
 ```
-```
 ## Get connected perturbations
 
 http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
@@ -132,53 +137,6 @@ http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_
 
 ## Get correlation plot
 http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls
-
-```{r correlation plot}
-# apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls"
-# # req <- GET(apiUrl)
-# # json <- httr::content(req, as = "text")
-# # json <- fromJSON(apiUrl)
-# # all.equal(plot, toJSON(fromJSON(apiUrl)))
-# json <- toJSON(fromJSON(apiUrl))
-# prettify(json)
-# class(json)
-# # plotly_build(json)
-# # explorePlot = plotly_json(fromJSON(json))
-# # plotly_build(explorePlot)
-# # # correlation_plot <- fromJSON(json)
-# # correlation_plot
-apiUrl <- "http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&output=widget"
-req <- GET(apiUrl)
-corrPlotUrl <- content(req)$url
-corrPlotUrl
-# htmltools::includeHTML(corrPlotUrl)
-
-# rmarkdown::all_output_formats(knitr::current_input())
-# if ("html_document" %in% rmarkdown::all_output_formats(knitr::current_input())) {
-if(getOutputFormat() == 'html_document') {
-  include_url(corrPlotUrl, height = "680px")
-} else {
-  print("output is not HTML")
-  print(getOutputFormat())
-  corrPlotUrl
-}
-```
-
-## Get GSEA plot
-```{r GSEA}
-apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
-req <- POST(apiUrl, body = list(signatureId = paste(ilincs_signatureId),genes = c(51474,7112,8570,55421,283337,54386,5214,79894,6136,5514,5170,6197,2321), output="widget"), encode = "json")
-gseaPlotUrl <- content(req)
-gseaPlotUrl
-# htmltools::includeHTML(corrPlotUrl)
-
-
-# if ("html" %in% rmarkdown::all_output_formats(knitr::current_input())) {
-#   include_url(gseaPlotUrl, height = "680px")
-# } else {
-#   gseaPlotUrl
-# }
-```
 
 ## Retriving Signature Metadata
 ```{r}
