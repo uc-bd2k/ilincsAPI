@@ -31,7 +31,7 @@ ilincs_libraries[,c("libraryID","libraryName")]
 ```
 
 ## Searching for signature using BROAD ID
-Searching for signature for given term. In this example "Diclofenac" coumpound will be shown as an example.
+###Searching for signature for given term. In this example "Diclofenac" coumpound will be shown as an example.
 
 ```{r}
 term <- "Diclofenac"
@@ -44,7 +44,7 @@ ilincs_result_df<-fromJSON(httr::content(req,type="text"))$data
 head(ilincs_result_df[,c("cellline","compound","concentration","signatureid","is_exemplar")])
 ```
 
-#Selecting a signature to analyze
+###Selecting a signature to analyze
 
 ```{r selectedSignature}
 ilincs_signatureId <- ilincs_result_df[1,"signatureid"]
@@ -59,14 +59,14 @@ ilincs_sessionId<-unlist(content(req))
 ilincs_sessionId
 ```
 
-# Retrieving data
+### Retrieving data
 ```{r volcano data}
 fileUrl=paste("http://www.ilincs.org/tmp/",ilincs_sessionId,".xls",sep="")
 signatureData<-read.table(fileUrl,sep="\t",header=T,stringsAsFactors = F)
 head(signatureData)
 ```
 
-# Insert volcano plot
+### Insert volcano plot
 ```{r volcano plot}
 apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
 req <- GET(apiUrl)
@@ -83,8 +83,8 @@ req <- GET(apiUrl)
 ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
 head(ilincs_conn_df)
 ```
-#Find LINCS signatures connected to user a submitted signature
-#User submitted signature in the form of a gene list
+##Find LINCS signatures connected to user a submitted signature
+###User submitted signature in the form of a gene list
 Create a gene list from Diclofenac signature
 ```{r query gene list}
 glist<-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],"Name_GeneSymbol"],collapse = ",")
