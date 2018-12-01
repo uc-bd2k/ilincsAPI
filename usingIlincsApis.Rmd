@@ -83,26 +83,49 @@ req <- GET(apiUrl)
 ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
 head(ilincs_conn_df)
 ```
-#Find LINCS signatures connected to user a submitted signature
-##User submitted signature in the form of a gene list
+##Find LINCS signatures connected to user a submitted signature
+###Creating user submitted signature in the form of a gene list
 ```{r subsetting signature}
-top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
-top100signatureGeneSymbols <- top100signature[,c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+# top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],]
 head(top100signature)
 ```
 
-## Uploading signature as a list genes for enrichment
+### Uploading signature as a list genes for enrichment
 ```{r}
 apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
 req <- POST(apiUrl, body = list(mode="geneList",metadata=TRUE,signatureProfile = list(genes=top100signature$Name_GeneSymbol)),encode = "json")
 ilincsEnrichedSignatures <- data.table::rbindlist(content(req)$sigScores, use.names = TRUE, fill = TRUE)
 head(ilincsEnrichedSignatures)
 ```
+## Get GSEA plot
+```{r GSEA}
+apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
+req <- POST(apiUrl, body = list(signatureId = ilincs_signatureId,genes = top100signature$ID_geneid, output="png"), encode = "json")
+
+gseaPlotPng <- content(req)$fileName
+gseaPlotUrl <- paste("http://www.ilincs.org/tmp/",gseaPlotPng,".png",sep="")
+include_graphics(gseaPlotUrl)
+```
+
+
+## Uploading signature as a list of up and down genes
+```{r}
+apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
+
+topUpRegulatedGenes <- list(genesUp=top100signature$Name_GeneSymbol[top100signature$Value_LogDiffExp > 0])
+topDownregulatedGenes <- list(genesDown=top100signature$Name_GeneSymbol[top100signature$Value_LogDiffExp < 0])
+
+req <- POST("http://www.ilincs.org/api/ilincsR/findConcordancesSC", body = list(mode="UpDn",metadata=TRUE,signatureProfile = c(topUpRegulatedGenes, topDownregulatedGenes)),encode = "json")
+
+ilincsUpDnConnectedSignatures <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+head(ilincsUpDnConnectedSignatures)
+```
 
 ## Uploading signature profile using 100 most significant genes
 ```{r}
 apiUrl<-"http://www.ilincs.org/api/ilincsR/findConcordancesSC"
-req <- POST(apiUrl, body = list(mode="fullSig",metadata=TRUE,signatureProfile = list(fullSig = top100signature)),encode = "json")
+req <- POST(apiUrl, body = list(mode="fullSig",metadata=TRUE,signatureProfile = list(fullSig = top100signature[,c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")])),encode = "json")
 
 connectedSignatures<-fromJSON(httr::content(req,type="text"))
 head(connectedSignatures)
@@ -111,16 +134,6 @@ ilincsConnectedSignatures <- data.table::rbindlist(req$concordanceTable, use.nam
 ilincsConnectedSignatures
 ```
 
-## Get GSEA plot
-```{r GSEA}
-apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
-geneids<-signatureData[order(signatureData$Significance_pvalue)[1:100],"ID_geneid"]
-req <- POST(apiUrl, body = list(signatureId = ilincs_signatureId,genes = geneids, output="png"), encode = "json")
-
-gseaPlotPng <- content(req)$fileName
-gseaPlotUrl <- paste("http://www.ilincs.org/tmp/",gseaPlotPng,".png",sep="")
-include_graphics(gseaPlotUrl)
-```
 
 ##Find connected signatures based on user submitted full signature
 ###Creating a file to upload from previouslsy downloaded signature file
