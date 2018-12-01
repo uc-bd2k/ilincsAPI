@@ -22,7 +22,7 @@ library(htmltools)
 
 ## Display Signature Libraries
 
-```{r}
+```{r list signature libraries}
 apiUrl <- "http://www.ilincs.org/api/SignatureLibraries"
 req <- GET(apiUrl)
 json <- httr::content(req, as = "text")
@@ -33,14 +33,13 @@ ilincs_libraries[,c("libraryID","libraryName")]
 ## Searching for signature using BROAD ID
 ###Searching for signature for given term. In this example "Diclofenac" coumpound will be shown as an example.
 
-```{r}
+```{r search signatures}
 term <- "Diclofenac"
 ilincs_libId<-"LIB_5"
 apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,"&library=",ilincs_libId,sep="")
 req <- GET(apiUrl)
 
 ilincs_result_df<-fromJSON(httr::content(req,type="text"))$data
-# head(ilincs_result_df)
 head(ilincs_result_df[,c("cellline","compound","concentration","signatureid","is_exemplar")])
 ```
 
@@ -53,7 +52,7 @@ ilincs_signatureId
 
 ## Getting signature data and vulcano plot
 ###The first step is to retrieve the session id for creation of the signature data table
-```{r}
+```{r retrieve signature data}
 req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId)), encode = "json")
 ilincs_sessionId<-unlist(content(req))
 ilincs_sessionId
@@ -73,7 +72,6 @@ req <- GET(apiUrl)
 ilincs_volcanoUrl<-paste("http://www.ilincs.org",content(req)$url,sep="")
 knitr::include_graphics(ilincs_volcanoUrl)
 ```
-
 
 ## Get connected signatures
 ```{r connected signatures}
@@ -109,8 +107,8 @@ include_graphics(gseaPlotUrl)
 ```
 
 
-## Uploading signature as a list of up and down genes
-```{r}
+##Signature as a list of up and down genes
+```{r up and down genes}
 apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
 
 topUpRegulatedGenes <- list(genesUp=top100signature$Name_GeneSymbol[top100signature$Value_LogDiffExp > 0])
@@ -176,24 +174,14 @@ head(iLincsConnectedGeneticPerturbations)
 
 
 
-## Get connected perturbations
-
-http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
-
-## Get connected perturbations
-
-http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
-
-## Get correlation plot
-http://www.ilincs.org/api/ilincsR/correlationPlot?sigID=LINCSCP_10270&sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls
-
 ## Retriving Signature Metadata
 ```{r}
 apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/",ilincs_signatureId,sep="")
 req <- GET(apiUrl)
 l <- lapply(content(req), function(x) unlist(x))
 ilincs_result <- data.frame(t(sapply(l,c)))
-knitr::kable(t(ilincs_result))
+ilincsSigMetaData<-fromJSON(content(req,type="text"))
+t(ilincs_result)
 ```
 
 
