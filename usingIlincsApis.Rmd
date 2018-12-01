@@ -4,8 +4,8 @@ output:
   html_document:
     df_print: paged
   html_notebook: default
-  word_document: default
   pdf_document: default
+  word_document: default
 ---
 
 <!-- ## Prerequisites  -->
@@ -19,7 +19,9 @@ library(plotly)
 library(htmltools)
 ```
 
-
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = "1400px")
+```
 ## Display Signature Libraries
 
 ```{r list signature libraries}
@@ -70,7 +72,7 @@ head(signatureData)
 apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
 req <- GET(apiUrl)
 ilincs_volcanoUrl<-paste("http://www.ilincs.org",content(req)$url,sep="")
-knitr::include_graphics(ilincs_volcanoUrl)
+include_graphics(ilincs_volcanoUrl)
 ```
 
 ## Get connected signatures
@@ -118,6 +120,28 @@ req <- POST("http://www.ilincs.org/api/ilincsR/findConcordancesSC", body = list(
 
 ilincsUpDnConnectedSignatures <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
 head(ilincsUpDnConnectedSignatures)
+```
+
+## Group analysis of top 20 most connected signatures with signature of interest
+```{r}
+signatureGroup <-ilincsUpDnConnectedSignatures$signatureID[1:20]
+apiUrl<-"http://www.ilincs.org/api/ilincsR/GroupLincsAnalysis"
+req<-POST(apiUrl, body = list(idList = signatureGroup,noOfGenes = 50), encode = "json")                   
+groupAnalysisSessionID <- content(req)$data[[2]]
+groupAnalysisSessionID
+```
+### [Signature group heatmap on iLINCS](http://www.ilincs.org/apps/heatmap/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
+
+```{r, out.width="910px"}
+heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
+include_url(heatmap_url, height = "900px")
+```
+
+### [Signature group PCA and tSNE app on iLINCS](http://www.ilincs.org/apps/pca/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
+
+```{r, out.width="910px"}
+pca_url<-paste("http://www.ilincs.org/apps/pca/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
+include_url(pca_url, height = "900px")
 ```
 
 ## Uploading signature profile using 100 most significant genes
