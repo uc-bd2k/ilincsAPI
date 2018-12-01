@@ -85,25 +85,38 @@ head(ilincs_conn_df)
 ```
 #Find LINCS signatures connected to user a submitted signature
 ##User submitted signature in the form of a gene list
-###Create a gene list from Diclofenac signature
-```{r query gene list}
-glist<-paste(signatureData[order(signatureData$Significance_pvalue)[1:100],"Name_GeneSymbol"],collapse = ",")
-glist
+```{r subsetting signature}
+top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+top100signatureGeneSymbols <- top100signature[,c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+head(top100signature)
 ```
-###Submit the list to iLINCS. In this case, iLINCS performs random set enrichment analysis  
-```{r connected via gene list}
-apiUrl <- "http://www.ilincs.org/api/ilincsR/GeneListEnrichment"
-req <- POST(apiUrl, body = list(geneList=glist, libName="LIB_5"), encode = "form")
+
+## Uploading signature as a list genes for enrichment
+```{r}
+apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
+req <- POST(apiUrl, body = list(mode="geneList",metadata=TRUE,signatureProfile = list(genes=top100signature$Name_GeneSymbol)),encode = "json")
+ilincsEnrichedSignatures <- data.table::rbindlist(content(req)$sigScores, use.names = TRUE, fill = TRUE)
+head(ilincsEnrichedSignatures)
+```
+
+## Uploading signature profile using 100 most significant genes
+```{r}
+apiUrl<-"http://www.ilincs.org/api/ilincsR/findConcordancesSC"
+req <- POST(apiUrl, body = list(mode="fullSig",metadata=TRUE,signatureProfile = list(fullSig = top100signature)),encode = "json")
+
 connectedSignatures<-fromJSON(httr::content(req,type="text"))
 head(connectedSignatures)
+
+ilincsConnectedSignatures <- data.table::rbindlist(req$concordanceTable, use.names = TRUE, fill = TRUE)
+ilincsConnectedSignatures
 ```
 
 ## Get GSEA plot
 ```{r GSEA}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
 geneids<-signatureData[order(signatureData$Significance_pvalue)[1:100],"ID_geneid"]
-
 req <- POST(apiUrl, body = list(signatureId = ilincs_signatureId,genes = geneids, output="png"), encode = "json")
+
 gseaPlotPng <- content(req)$fileName
 gseaPlotUrl <- paste("http://www.ilincs.org/tmp/",gseaPlotPng,".png",sep="")
 include_graphics(gseaPlotUrl)
@@ -118,9 +131,8 @@ system(paste("head sigFile.tsv"))
 
 ###Upload the file
 ```{r}
-getwd()
 sigFile <- "sigFile.tsv"
-processFile <- content(POST("http://www.ilincs.org/api/SignatureMeta/upload", body = list(file = upload_file(sigFile))))
+processFile <- content(POST("http://www.ilincs.org/api/SignatureMeta/upload", body=list(file=upload_file(sigFile))))
 signatureFile <- processFile$status$fileName[[1]]
 signatureFile
 ```
@@ -131,6 +143,26 @@ req <- (POST(apiUrl, body = list(file=signatureFile, lib="LIB_5", path="/mnt/rai
 output <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
 head(output)
 ```
+## Find connected compound perturbations
+```{r connected compound perturbations}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=",signatureFile,"&library=LIB_5&metadata=TRUE",sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+iLincsConnectedCompoundPerturbations <- fromJSON(json)$enrichment
+head(iLincsConnectedCompoundPerturbations)
+```
+## Get connected genetic perturbations
+
+```{r connected genetic perturbations}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=",signatureFile,"&library=LIB_6",sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+iLincsConnectedGeneticPerturbations <- fromJSON(json)$enrichment
+head(iLincsConnectedGeneticPerturbations)
+```
+
+
+
 ## Get connected perturbations
 
 http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=sig_Tue_Nov_27_13_21_36_2018_9007331.xls&library=LIB_5
