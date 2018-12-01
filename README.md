@@ -1,20 +1,18 @@
-# ilincsAPI
+# ilincsAPI in action
 
-## Connectivity R markdown
-[Connectivity R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/Connectivity.Rmd)
+This repository consists of set of exeamples to showcase the ways of interacting with iLINCS API
 
-## Connectivity HTML output
-[Connectivity HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/Connectivity.html)
+## [Using iLINCS API R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/Connectivity.Rmd)
 
-## Signature Enrichment R markdown
-[Signature Enrichment R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/sigEnrichment.Rmd)
+## [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
 
-## Signature Enrichment HTML output
+For more information checkout:
 
-[Signature Enrichment HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/sigEnrichment.html)
+## [iLINCS API info page](http://www.ilincs.org/ilincs/APIinfo)
 
-## Signature from dataset R markdown
-[Signature from dataset R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/SignatureFromDataset.Rmd)
+## [iLINCS API explorer](http://www.ilincs.org/ilincs/APIdocumentation)
 
-## Signature from dataset HTML output
-[Signature from dataset HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/SignatureFromDataset.html)
+## [iLINCS help](http://www.ilincs.org/help/)
+
+## [iLINCS support group](http://www.ilincs.org/ilincs/support)
+
