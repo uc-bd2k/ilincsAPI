@@ -2,7 +2,7 @@
 
 This repository consists of set of exeamples to showcase the ways of interacting with iLINCS API
 
-## [Using iLINCS API R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/Connectivity.Rmd)
+## [Using iLINCS API R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.Rmd)
 
 ## [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
 
