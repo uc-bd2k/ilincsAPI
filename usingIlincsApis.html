@@ -181,7 +181,7 @@ ilincs_signatureId</code></pre>
 ilincs_sessionId&lt;-unlist(content(req))
 ilincs_sessionId</code></pre>
 <pre><code>##                                   data 
-## &quot;sig_Mon_Dec__3_11_16_56_2018_6372507&quot;</code></pre>
+## &quot;sig_Mon_Dec__3_11_59_19_2018_7297882&quot;</code></pre>
 </div>
 <div id="retrieving-data" class="section level3">
 <h3>Retrieving data</h3>
@@ -277,22 +277,18 @@ apiUrl&lt;-&quot;http://www.ilincs.org/api/ilincsR/GroupLincsAnalysis&quot;
 req&lt;-POST(apiUrl, body = list(idList = signatureGroup,noOfGenes = 50), encode = &quot;json&quot;)                   
 groupAnalysisSessionID &lt;- content(req)$data[[2]]
 groupAnalysisSessionID</code></pre>
-<pre><code>## [1] &quot;Mon_Dec__11_17_36_3_6159732&quot;</code></pre>
+<pre><code>## [1] &quot;Mon_Dec__11_59_59_3_3049276&quot;</code></pre>
 <div id="signature-group-heatmap-on-ilincs" class="section level3">
-<h3><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec__11_17_36_3_6159732&amp;property=signatureID">Signature group heatmap on iLINCS</a></h3>
+<h3><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec__11_59_59_3_3049276&amp;property=signatureID">Signature group heatmap on iLINCS</a></h3>
 <pre class="r"><code>heatmap_url&lt;-paste(&quot;http://www.ilincs.org/apps/heatmap/?sessionID=&quot;,groupAnalysisSessionID,&quot;&amp;property=signatureID&quot;,sep = &quot;&quot;)
-browseURL(heatmap_url)
-include_url(heatmap_url, height = &quot;900px&quot;)</code></pre>
-<iframe src="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec__11_17_36_3_6159732&amp;property=signatureID" width="1200px" height="900px">
-</iframe>
+# browseURL(heatmap_url)  ##uncoment to launch the browser
+# include_url(heatmap_url, height = &quot;900px&quot;)  ##uncomment to embed in iframe</code></pre>
 </div>
 <div id="signature-group-pca-and-tsne-app-on-ilincs" class="section level3">
-<h3><a href="http://www.ilincs.org/apps/pca/?sessionID=Mon_Dec__11_17_36_3_6159732&amp;property=signatureID">Signature group PCA and tSNE app on iLINCS</a></h3>
+<h3><a href="http://www.ilincs.org/apps/pca/?sessionID=Mon_Dec__11_59_59_3_3049276&amp;property=signatureID">Signature group PCA and tSNE app on iLINCS</a></h3>
 <pre class="r"><code>pca_url&lt;-paste(&quot;http://www.ilincs.org/apps/pca/?sessionID=&quot;,groupAnalysisSessionID,&quot;&amp;property=signatureID&quot;,sep = &quot;&quot;)
-browseURL(pca_url)
-include_url(pca_url, height = &quot;900px&quot;)</code></pre>
-<iframe src="http://www.ilincs.org/apps/pca/?sessionID=Mon_Dec__11_17_36_3_6159732&amp;property=signatureID" width="1200px" height="900px">
-</iframe>
+# browseURL(pca_url)  ##uncoment to launch the browser
+# include_url(pca_url, height = &quot;900px&quot;)  ##uncomment to embed in iframe</code></pre>
 </div>
 </div>
 <div id="find-connected-signatures-based-on-user-submitted-full-signature" class="section level2">
@@ -308,7 +304,7 @@ system(paste(&quot;head sigFile.tsv&quot;))</code></pre>
 processFile &lt;- content(POST(&quot;http://www.ilincs.org/api/SignatureMeta/upload&quot;, body=list(file=upload_file(sigFile))))
 signatureFile &lt;- processFile$status$fileName[[1]]
 signatureFile</code></pre>
-<pre><code>## [1] &quot;processedSig_Mon_Dec_3_11_17_40_2018_2340017.xls&quot;</code></pre>
+<pre><code>## [1] &quot;processedSig_Mon_Dec_3_12_00_04_2018_6204578.xls&quot;</code></pre>
 </div>
 <div id="find-connected-signatures" class="section level3">
 <h3>Find connected signatures</h3>
@@ -484,7 +480,7 @@ apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/LincsDataAnalysis&quot;
 req &lt;- POST(apiUrl, body = list(exp = paste(experiment),prop = property,filterchk=paste(level1,level2,sep = &quot;,,,&quot;),includeORexclude=1), encode = &quot;json&quot;)
 createdSignaturesSessionID &lt;- content(req)$sessionID
 createdSignaturesSessionID</code></pre>
-<pre><code>## [1] &quot;Mon_Dec_3_11_18_21_2018_9168734&quot;</code></pre>
+<pre><code>## [1] &quot;Mon_Dec_3_12_00_45_2018_8110674&quot;</code></pre>
 </div>
 <div id="top-100-genes-in-created-signature" class="section level2">
 <h2>Top 100 genes in created signature</h2>
@@ -501,12 +497,10 @@ head(top100signatureData)</code></pre>
 <h3>Heatmap of data used in signature creation</h3>
 </div>
 <div id="signature-group-heatmap-on-ilincs-1" class="section level3">
-<h3><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec_3_11_18_21_2018_9168734&amp;property=ER&amp;geneCount=100">Signature group heatmap on iLINCS</a></h3>
+<h3><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec_3_12_00_45_2018_8110674&amp;property=ER&amp;geneCount=100">Signature group heatmap on iLINCS</a></h3>
 <pre class="r"><code>heatmap_url2&lt;-paste(&quot;http://www.ilincs.org/apps/heatmap/?sessionID=&quot;,createdSignaturesSessionID,&quot;&amp;property=&quot;,property,&quot;&amp;geneCount=100&quot;,sep = &quot;&quot;)
-browseURL(heatmap_url2)
-include_url(heatmap_url2, height = &quot;900px&quot;)</code></pre>
-<iframe src="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec_3_11_18_21_2018_9168734&amp;property=ER&amp;geneCount=100" width="1200px" height="900px">
-</iframe>
+# browseURL(heatmap_url2)  ##uncomment to launch in a browser
+# include_url(heatmap_url2, height = &quot;900px&quot;)  ##uncomment to embed in an iframe</code></pre>
 </div>
 </div>
 

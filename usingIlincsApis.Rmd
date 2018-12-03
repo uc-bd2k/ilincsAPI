@@ -137,16 +137,16 @@ groupAnalysisSessionID
 
 ```{r interactive heatmap, out.width="1200px"}
 heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
-browseURL(heatmap_url)
-include_url(heatmap_url, height = "900px")
+# browseURL(heatmap_url)  ##uncoment to launch the browser
+# include_url(heatmap_url, height = "900px")  ##uncomment to embed in iframe
 ```
 
 ### [Signature group PCA and tSNE app on iLINCS](http://www.ilincs.org/apps/pca/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
 
 ```{r dimensionality reduction, out.width="1200px", fig.align="center"}
 pca_url<-paste("http://www.ilincs.org/apps/pca/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
-browseURL(pca_url)
-include_url(pca_url, height = "900px")
+# browseURL(pca_url)  ##uncoment to launch the browser
+# include_url(pca_url, height = "900px")  ##uncomment to embed in iframe
 ```
 
 ##Find connected signatures based on user submitted full signature
@@ -265,8 +265,8 @@ head(top100signatureData)
 
 ```{r, out.width="1200px"}
 heatmap_url2<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",createdSignaturesSessionID,"&property=",property,"&geneCount=100",sep = "")
-browseURL(heatmap_url2)
-include_url(heatmap_url2, height = "900px")
+# browseURL(heatmap_url2)  ##uncomment to launch in a browser
+# include_url(heatmap_url2, height = "900px")  ##uncomment to embed in an iframe
 ```
 
 
