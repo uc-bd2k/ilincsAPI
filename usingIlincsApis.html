@@ -174,7 +174,7 @@ ilincs_signatureId</code></pre>
 ilincs_sessionId&lt;-unlist(content(req))
 ilincs_sessionId</code></pre>
 <pre><code>##                                   data 
-## &quot;sig_Sat_Dec__1_18_31_48_2018_6996400&quot;</code></pre>
+## &quot;sig_Mon_Dec__3_09_36_07_2018_3805150&quot;</code></pre>
 </div>
 <div id="retrieving-data" class="section level3">
 <h3>Retrieving data</h3>
@@ -270,19 +270,19 @@ apiUrl&lt;-&quot;http://www.ilincs.org/api/ilincsR/GroupLincsAnalysis&quot;
 req&lt;-POST(apiUrl, body = list(idList = signatureGroup,noOfGenes = 50), encode = &quot;json&quot;)                   
 groupAnalysisSessionID &lt;- content(req)$data[[2]]
 groupAnalysisSessionID</code></pre>
-<pre><code>## [1] &quot;Sat_Dec__18_32_28_1_5564714&quot;</code></pre>
+<pre><code>## [1] &quot;Mon_Dec__09_36_49_3_3544887&quot;</code></pre>
 <div id="signature-group-heatmap-on-ilincs" class="section level3">
-<h3><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Sat_Dec__18_32_28_1_5564714&amp;property=signatureID">Signature group heatmap on iLINCS</a></h3>
+<h3><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec__09_36_49_3_3544887&amp;property=signatureID">Signature group heatmap on iLINCS</a></h3>
 <pre class="r"><code>heatmap_url&lt;-paste(&quot;http://www.ilincs.org/apps/heatmap/?sessionID=&quot;,groupAnalysisSessionID,&quot;&amp;property=signatureID&quot;,sep = &quot;&quot;)
 include_url(heatmap_url, height = &quot;900px&quot;)</code></pre>
-<iframe src="http://www.ilincs.org/apps/heatmap/?sessionID=Sat_Dec__18_32_28_1_5564714&amp;property=signatureID" width="910px" height="900px">
+<iframe src="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec__09_36_49_3_3544887&amp;property=signatureID" width="1200px" height="900px">
 </iframe>
 </div>
 <div id="signature-group-pca-and-tsne-app-on-ilincs" class="section level3">
-<h3><a href="http://www.ilincs.org/apps/pca/?sessionID=Sat_Dec__18_32_28_1_5564714&amp;property=signatureID">Signature group PCA and tSNE app on iLINCS</a></h3>
+<h3><a href="http://www.ilincs.org/apps/pca/?sessionID=Mon_Dec__09_36_49_3_3544887&amp;property=signatureID">Signature group PCA and tSNE app on iLINCS</a></h3>
 <pre class="r"><code>pca_url&lt;-paste(&quot;http://www.ilincs.org/apps/pca/?sessionID=&quot;,groupAnalysisSessionID,&quot;&amp;property=signatureID&quot;,sep = &quot;&quot;)
 include_url(pca_url, height = &quot;900px&quot;)</code></pre>
-<iframe src="http://www.ilincs.org/apps/pca/?sessionID=Sat_Dec__18_32_28_1_5564714&amp;property=signatureID" width="910px" height="900px">
+<iframe src="http://www.ilincs.org/apps/pca/?sessionID=Mon_Dec__09_36_49_3_3544887&amp;property=signatureID" width="1200px" height="900px">
 </iframe>
 </div>
 </div>
@@ -327,7 +327,7 @@ system(paste(&quot;head sigFile.tsv&quot;))</code></pre>
 processFile &lt;- content(POST(&quot;http://www.ilincs.org/api/SignatureMeta/upload&quot;, body=list(file=upload_file(sigFile))))
 signatureFile &lt;- processFile$status$fileName[[1]]
 signatureFile</code></pre>
-<pre><code>## [1] &quot;processedSig_Sat_Dec_1_18_32_33_2018_4670059.xls&quot;</code></pre>
+<pre><code>## [1] &quot;processedSig_Mon_Dec_3_09_36_55_2018_7162831.xls&quot;</code></pre>
 </div>
 <div id="find-connected-signatures" class="section level3">
 <h3>Find connected signatures</h3>
@@ -407,6 +407,126 @@ ilincsSigMetaData&lt;-fromJSON(content(req,type=&quot;text&quot;))</code></pre>
 ## stitchID          &quot;NA&quot;                                      
 ## pubChemID         &quot;3033&quot;                                    
 ## is_exemplar       1</code></pre>
+<div id="list-of-lincs-datasets" class="section level3">
+<h3>List of LINCS Datasets</h3>
+<pre class="r"><code>apiUrl &lt;- &quot;http://www.ilincs.org/api/PublicDatasets/getDatasets?lincs=true&quot;
+req &lt;- GET(apiUrl)
+json &lt;- httr::content(req, as = &quot;text&quot;)
+lincs_datasets &lt;- fromJSON(json)
+lincsDatasets &lt;- data.frame(lincs_datasets$data)
+lincsDatasets[c(&quot;experiment&quot;,&quot;assay&quot;,&quot;dataType&quot;)]</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["experiment"],"name":[1],"type":["chr"],"align":["left"]},{"label":["assay"],"name":[2],"type":["chr"],"align":["left"]},{"label":["dataType"],"name":[3],"type":["chr"],"align":["left"]}],"data":[{"1":"Cancer Therapeutics Response Portal (CTRP)","2":"Cell growth inhibition","3":"Cell viability","_rn_":"1"},{"1":"EDS-1013","2":"RPPA","3":"Proteomics","_rn_":"2"},{"1":"EDS-1014","2":"RNA-seq","3":"Gene Expression","_rn_":"3"},{"1":"Genentech Cell Line Screening Initiative (gCSI)","2":"Cell growth inhibition","3":"Cell viability","_rn_":"4"},{"1":"LDG-1188","2":"L1000","3":"Gene Expression","_rn_":"5"},{"1":"LDG-1193","2":"P100","3":"Proteomics","_rn_":"6"},{"1":"LDG-1228","2":"P100","3":"Proteomics","_rn_":"7"},{"1":"LDG-1230","2":"GCP","3":"Proteomics","_rn_":"8"},{"1":"LDG-1231","2":"RNA-seq","3":"Gene Expression","_rn_":"9"},{"1":"LDG-1233","2":"RNA-seq","3":"Gene Expression","_rn_":"10"},{"1":"LDG-1255","2":"P100","3":"Proteomics","_rn_":"11"},{"1":"LDG-1256","2":"GCP","3":"Proteomics","_rn_":"12"},{"1":"LDG-1259","2":"RNA-seq","3":"Gene Expression","_rn_":"13"},{"1":"LDG-1284","2":"GCP","3":"Proteomics","_rn_":"14"},{"1":"LDG-1285","2":"P100","3":"Proteomics","_rn_":"15"},{"1":"LDG-1297","2":"RNA-seq","3":"Gene Expression","_rn_":"16"},{"1":"LDG-1338","2":"RNA-seq","3":"Gene Expression","_rn_":"17"},{"1":"LDS-1261 to LDS-1263","2":"Cell growth inhibition","3":"Cell viability","_rn_":"18"},{"1":"LDS-1294 to LDS-1295","2":"Cell growth inhibition","3":"Cell viability","_rn_":"19"},{"1":"LDS-1362 to LDS-1365","2":"Cell growth inhibition","3":"Cell viability","_rn_":"20"},{"1":"LDS-1373 to LDS-1381","2":"Cell growth inhibition","3":"Cell viability","_rn_":"21"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="dataset-metadata" class="section level3">
+<h3>Dataset metadata</h3>
+<p><strong>Example:</strong> EDS-1014</p>
+<pre class="r"><code>experiment &lt;- &quot;EDS-1014&quot;
+
+apiUrl &lt;- paste(&quot;http://www.ilincs.org/api/PublicDatasets/&quot;,experiment,sep=&quot;&quot;)
+req &lt;- GET(apiUrl)
+json &lt;- httr::content(req, as = &quot;text&quot;)
+datasetMetaData &lt;- fromJSON(json)
+datasetMetaData</code></pre>
+<pre><code>## $platform
+## [1] &quot;GPL10999syn2347004&quot;
+## 
+## $description
+## [1] &quot;54 mRNA-seq samples from baseline, unperturbed breast cancer cell lines were profiled using Illumina Genome Analyzer IIx to identify patterns of gene expression associated with subtype and response to therapeutic compounds. Data were generated by Microenvironment Perturbagen (MEP) LINCS Center at Oregon Health and Science University.&quot;
+## 
+## $geolink
+## [1] &quot;https://www.synapse.org/#!Synapse:syn2347004&quot;
+## 
+## $lincsDsgc
+## [1] &quot;ohsu&quot;
+## 
+## $publink
+## [1] &quot;http://www.ncbi.nlm.nih.gov/pubmed/24176112&quot;
+## 
+## $pubmeddescription
+## [1] &quot;Daemen A, Griffith OL, Heiser LM, Wang NJ et al. Modeling precision treatment of breast cancer. Genome Biol 2013;14(10):R110.&quot;
+## 
+## $experiment
+## [1] &quot;EDS-1014&quot;
+## 
+## $assay
+## [1] &quot;RNA-seq&quot;
+## 
+## $dataFormat
+## [1] &quot;MaxD&quot;
+## 
+## $sampleType
+## [1] &quot;cellline&quot;
+## 
+## $dataType
+## [1] &quot;Gene Expression&quot;
+## 
+## $organism
+## [1] &quot;human&quot;
+## 
+## $portal
+## [1] &quot;LINCS&quot;
+## 
+## $SourceID
+## [1] &quot;EDS-1014&quot;</code></pre>
+<p><a href="http://www.ilincs.org/apps/heatmap/?data_set=EDS-1014">Heatmap for dataset EDS-1014 on iLINCS</a></p>
+<p><a href="http://www.ilincs.org/apps/pca/?data_set=EDS-1014">PCA and tSNE for dataset EDS-1014 on iLINCS</a></p>
+</div>
+<div id="dataset-sample-metadata" class="section level3">
+<h3>Dataset sample metadata</h3>
+<pre class="r"><code>apiUrl &lt;- paste(&quot;http://www.ilincs.org/api/ilincsR/getSamples?id=&quot;,experiment,sep=&quot;&quot;)
+req &lt;- GET(apiUrl)
+json &lt;- httr::content(req, as = &quot;text&quot;)
+sampleMeta &lt;- fromJSON(json)
+sampleMetaData &lt;- data.frame(sampleMeta$data$rows)
+head(sampleMetaData)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["MeasurementName"],"name":[1],"type":["chr"],"align":["left"]},{"label":["cell"],"name":[2],"type":["chr"],"align":["left"]},{"label":["cell_type"],"name":[3],"type":["chr"],"align":["left"]},{"label":["CK14"],"name":[4],"type":["chr"],"align":["left"]},{"label":["CK19"],"name":[5],"type":["chr"],"align":["left"]},{"label":["CK5"],"name":[6],"type":["chr"],"align":["left"]},{"label":["CK8.18"],"name":[7],"type":["chr"],"align":["left"]},{"label":["EGFR"],"name":[8],"type":["chr"],"align":["left"]},{"label":["ER"],"name":[9],"type":["chr"],"align":["left"]},{"label":["ERBB2"],"name":[10],"type":["chr"],"align":["left"]},{"label":["geo_accession"],"name":[11],"type":["chr"],"align":["left"]},{"label":["PGR"],"name":[12],"type":["chr"],"align":["left"]},{"label":["subtype"],"name":[13],"type":["chr"],"align":["left"]},{"label":["subtype_4class"],"name":[14],"type":["chr"],"align":["left"]},{"label":["subtype_charact"],"name":[15],"type":["chr"],"align":["left"]}],"data":[{"1":"EDS-1014_184A1","2":"184A1","3":"breast cancer","4":"<NA>","5":"<NA>","6":"<NA>","7":"<NA>","8":"<NA>","9":"<NA>","10":"<NA>","11":"GSM1172844","12":"<NA>","13":"Non-malignant","14":"Non-malignant","15":"<NA>","_rn_":"1"},{"1":"EDS-1014_184B5","2":"184B5","3":"breast cancer","4":"<NA>","5":"<NA>","6":"<NA>","7":"<NA>","8":"<NA>","9":"<NA>","10":"<NA>","11":"GSM1172845","12":"<NA>","13":"Non-malignant","14":"Non-malignant","15":"<NA>","_rn_":"2"},{"1":"EDS-1014_21MT1","2":"21MT1","3":"breast cancer","4":"<NA>","5":"<NA>","6":"<NA>","7":"<NA>","8":"<NA>","9":"<NA>","10":"<NA>","11":"GSM1172846","12":"<NA>","13":"Basal","14":"ERBB2AMP","15":"<NA>","_rn_":"3"},{"1":"EDS-1014_21MT2","2":"21MT2","3":"breast cancer","4":"<NA>","5":"<NA>","6":"<NA>","7":"<NA>","8":"<NA>","9":"<NA>","10":"<NA>","11":"GSM1172847","12":"<NA>","13":"Basal","14":"ERBB2AMP","15":"<NA>","_rn_":"4"},{"1":"EDS-1014_21NT","2":"21NT","3":"breast cancer","4":"<NA>","5":"<NA>","6":"<NA>","7":"<NA>","8":"<NA>","9":"<NA>","10":"<NA>","11":"GSM1172848","12":"<NA>","13":"Basal","14":"ERBB2AMP","15":"<NA>","_rn_":"5"},{"1":"EDS-1014_21PT","2":"21PT","3":"breast cancer","4":"<NA>","5":"<NA>","6":"<NA>","7":"<NA>","8":"<NA>","9":"<NA>","10":"<NA>","11":"GSM1172849","12":"<NA>","13":"Basal","14":"ERBB2AMP","15":"<NA>","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div id="creating-signature-using-ilincs" class="section level2">
+<h2>Creating signature using iLINCS</h2>
+<p><a href="http://www.ilincs.org/ilincs/dataset/EDS-1014/createSignature">Create signature from dataset EDS-1014 on iLINCS</a></p>
+</div>
+<div id="creating-signature-using-ilincs-api" class="section level2">
+<h2>Creating signature using iLINCS API</h2>
+<pre class="r"><code>property &lt;- &quot;ER&quot;
+level1 &lt;- &quot;ER:+&quot;
+level2 &lt;- &quot;ER:-&quot;
+apiUrl &lt;- &quot;http://www.ilincs.org/api/ilincsR/LincsDataAnalysis&quot;
+req &lt;- POST(apiUrl, body = list(exp = paste(experiment),prop = property,filterchk=paste(level1,level2,sep = &quot;,,,&quot;),includeORexclude=1), encode = &quot;json&quot;)
+createdSignaturesSessionID &lt;- content(req)$sessionID
+createdSignaturesSessionID</code></pre>
+<pre><code>## [1] &quot;Mon_Dec_3_09_37_34_2018_3317810&quot;</code></pre>
+</div>
+<div id="top-100-genes-in-created-signature" class="section level2">
+<h2>Top 100 genes in created signature</h2>
+<pre class="r"><code>l &lt;- lapply(content(req)$geneData, function(x) unlist(x))
+ilincs_result &lt;- data.frame(t(sapply(l,c)))
+top100signatureData &lt;- ilincs_result[1:100,c(&quot;Name_GeneSymbol&quot;,&quot;Value_LogDiffExp&quot;,&quot;Significance_pvalue&quot;)]
+top100signatureData</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Name_GeneSymbol"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["Value_LogDiffExp"],"name":[2],"type":["fctr"],"align":["left"]},{"label":["Significance_pvalue"],"name":[3],"type":["fctr"],"align":["left"]}],"data":[{"1":"ESR1","2":"5.04612368895955","3":"9.77717053245281e-11","_rn_":"1"},{"1":"LONRF2","2":"3.5886776758536","3":"1.76926493709e-10","_rn_":"2"},{"1":"C5AR2","2":"4.67488171523746","3":"5.50651622231375e-10","_rn_":"3"},{"1":"HLA-DQA2","2":"2.19208545626605","3":"8.53024554068061e-08","_rn_":"4"},{"1":"ACER1","2":"2.73772191502951","3":"2.87510651441037e-07","_rn_":"5"},{"1":"GREB1","2":"4.60204070527715","3":"3.7267975079554e-07","_rn_":"6"},{"1":"LRRC6","2":"1.99097719367892","3":"8.90304454511493e-07","_rn_":"7"},{"1":"GPR143","2":"3.02763327442877","3":"8.99421760927657e-07","_rn_":"8"},{"1":"CCDC170","2":"3.41206099242276","3":"1.23803591732977e-06","_rn_":"9"},{"1":"CTSC","2":"-3.65860061171146","3":"2.54582840640148e-06","_rn_":"10"},{"1":"C6orf165","2":"1.87458319411857","3":"2.82481441072004e-06","_rn_":"11"},{"1":"SCUBE2","2":"4.37204049312952","3":"2.92654669087992e-06","_rn_":"12"},{"1":"TMEM229B","2":"3.3956533233375","3":"3.19403534882945e-06","_rn_":"13"},{"1":"ABAT","2":"3.73240363340801","3":"4.31188889457818e-06","_rn_":"14"},{"1":"PGR","2":"3.68225981218202","3":"4.72291684747679e-06","_rn_":"15"},{"1":"CAPN9","2":"3.06576589296903","3":"4.91691363340972e-06","_rn_":"16"},{"1":"ST6GALNAC2","2":"3.97978787393939","3":"5.0905258074134e-06","_rn_":"17"},{"1":"CACNA2D2","2":"2.50493061927588","3":"5.57024985373048e-06","_rn_":"18"},{"1":"RHOH","2":"3.17909026034967","3":"5.64768187721122e-06","_rn_":"19"},{"1":"SYAP1","2":"0.969785068731589","3":"6.16939815781236e-06","_rn_":"20"},{"1":"RUNDC1","2":"0.822032050880241","3":"6.27930788567006e-06","_rn_":"21"},{"1":"DCDC2","2":"2.47590260276083","3":"6.38881777918102e-06","_rn_":"22"},{"1":"TFF3","2":"7.28643197195881","3":"6.81030885610719e-06","_rn_":"23"},{"1":"MRFAP1","2":"0.792339331509658","3":"8.01196223762814e-06","_rn_":"24"},{"1":"CIB3","2":"2.28452709612615","3":"8.86974249647048e-06","_rn_":"25"},{"1":"IGDCC3","2":"2.49210624894579","3":"1.0158897348645e-05","_rn_":"26"},{"1":"IQSEC1","2":"1.04612429892071","3":"1.13253392588914e-05","_rn_":"27"},{"1":"FMNL2","2":"-2.3442204988917","3":"1.28347966856751e-05","_rn_":"28"},{"1":"AGAP11","2":"2.09340138251019","3":"1.32011124598008e-05","_rn_":"29"},{"1":"NCOA7","2":"-1.98133267213042","3":"1.3290258213657e-05","_rn_":"30"},{"1":"TFF1","2":"7.15271229371753","3":"1.34837310152179e-05","_rn_":"31"},{"1":"AGR3","2":"4.11650736123662","3":"1.52427162638008e-05","_rn_":"32"},{"1":"EPHA10","2":"2.46224077852165","3":"1.57932495062204e-05","_rn_":"33"},{"1":"CLSTN2","2":"3.71050331154942","3":"1.72865907977181e-05","_rn_":"34"},{"1":"ANKRD30B","2":"2.79071881371207","3":"1.79362187133243e-05","_rn_":"35"},{"1":"REPS2","2":"2.01403756062111","3":"1.80477326244254e-05","_rn_":"36"},{"1":"B3GNT5","2":"-3.21149927205281","3":"1.81725700461484e-05","_rn_":"37"},{"1":"PREX1","2":"4.4609444760037","3":"1.94851207576695e-05","_rn_":"38"},{"1":"CACNA1H","2":"4.15195481741207","3":"2.04620522855699e-05","_rn_":"39"},{"1":"MRFAP1L1","2":"0.813978990108829","3":"2.19445522428786e-05","_rn_":"40"},{"1":"ATP7B","2":"2.73645572985023","3":"2.26231977399064e-05","_rn_":"41"},{"1":"GNMT","2":"2.55978476514783","3":"2.47875414479826e-05","_rn_":"42"},{"1":"CA5B","2":"1.61011759190509","3":"3.08727521674415e-05","_rn_":"43"},{"1":"SDHAF3","2":"-3.93323259861485","3":"3.19840722171436e-05","_rn_":"44"},{"1":"COL2A1","2":"1.64099901721412","3":"3.29936254344228e-05","_rn_":"45"},{"1":"ARMT1","2":"1.78967383724046","3":"3.36829293422829e-05","_rn_":"46"},{"1":"CEACAM5","2":"3.39475067601454","3":"3.65996256486732e-05","_rn_":"47"},{"1":"KIAA0825","2":"0.832338238720004","3":"4.05825767128605e-05","_rn_":"48"},{"1":"KLHDC9","2":"3.34732164386763","3":"4.5514373886889e-05","_rn_":"49"},{"1":"GADD45A","2":"-1.990983452368","3":"4.81251893954074e-05","_rn_":"50"},{"1":"MSI1","2":"2.9372557348105","3":"4.88916883155962e-05","_rn_":"51"},{"1":"SERPINA11","2":"1.64307206201815","3":"5.03500280506753e-05","_rn_":"52"},{"1":"PRLR","2":"3.50797454431773","3":"5.27416255444001e-05","_rn_":"53"},{"1":"CACNG4","2":"4.07202131204831","3":"5.42167117737147e-05","_rn_":"54"},{"1":"ZSWIM5","2":"2.29517548407694","3":"5.67374712212033e-05","_rn_":"55"},{"1":"HRH1","2":"-2.64408036889095","3":"5.72609646853319e-05","_rn_":"56"},{"1":"XBP1","2":"2.62520697997368","3":"5.90877994764533e-05","_rn_":"57"},{"1":"CRYL1","2":"1.9128389950519","3":"5.9260958070087e-05","_rn_":"58"},{"1":"SLC9A2","2":"3.25845137311756","3":"6.39475220080277e-05","_rn_":"59"},{"1":"ANXA9","2":"3.53772287431727","3":"6.97025996966223e-05","_rn_":"60"},{"1":"ZMAT4","2":"2.04567862633073","3":"7.19231672632422e-05","_rn_":"61"},{"1":"HMGCS2","2":"3.90131867605867","3":"7.24505160959938e-05","_rn_":"62"},{"1":"KIF12","2":"3.72897792007316","3":"7.3772376959353e-05","_rn_":"63"},{"1":"COL4A2","2":"-4.20761493369216","3":"7.51060521894559e-05","_rn_":"64"},{"1":"MACROD2","2":"1.65970888851224","3":"7.54741223963893e-05","_rn_":"65"},{"1":"KIAA1324","2":"4.45208988987158","3":"7.9507961049308e-05","_rn_":"66"},{"1":"PACSIN1","2":"2.95089981584667","3":"8.3171351531909e-05","_rn_":"67"},{"1":"KIAA1467","2":"1.68379199388889","3":"8.55174048393771e-05","_rn_":"68"},{"1":"PRRT3","2":"1.97735728264682","3":"8.55893067032631e-05","_rn_":"69"},{"1":"DEGS2","2":"4.52656733504305","3":"8.56854302870395e-05","_rn_":"70"},{"1":"SOWAHA","2":"3.01914301354608","3":"8.85675696774337e-05","_rn_":"71"},{"1":"CXCL2","2":"-3.03104385562411","3":"9.03036817124168e-05","_rn_":"72"},{"1":"SULT2B1","2":"3.75491947514699","3":"9.29666563961827e-05","_rn_":"73"},{"1":"BCAS1","2":"4.53180406429348","3":"9.32878450001585e-05","_rn_":"74"},{"1":"PPP1R18","2":"-1.56433781234286","3":"9.55097626269003e-05","_rn_":"75"},{"1":"TDH","2":"1.51129647032924","3":"0.000100278372760814","_rn_":"76"},{"1":"MED13L","2":"1.0622400835028","3":"0.000100421613370369","_rn_":"77"},{"1":"RET","2":"3.9332450602672","3":"0.000103158402615466","_rn_":"78"},{"1":"CXCL8","2":"-3.07665135711811","3":"0.000103517717157653","_rn_":"79"},{"1":"SEPT8","2":"1.05628108861366","3":"0.000104463745776361","_rn_":"80"},{"1":"AFF3","2":"3.05228250183416","3":"0.000104466578872204","_rn_":"81"},{"1":"DYNLRB2","2":"2.25935604704875","3":"0.00010589681994977","_rn_":"82"},{"1":"ADD1","2":"0.768502175287397","3":"0.000107923985533168","_rn_":"83"},{"1":"BBS1","2":"1.16795275790582","3":"0.000108038230728944","_rn_":"84"},{"1":"ZFYVE21","2":"1.00141109377933","3":"0.000113736454978853","_rn_":"85"},{"1":"BCAS3","2":"1.83694291886031","3":"0.000114677278246342","_rn_":"86"},{"1":"PDGFC","2":"-2.42494464391296","3":"0.000122919991997982","_rn_":"87"},{"1":"CYFIP2","2":"3.25981823391897","3":"0.000123915464361201","_rn_":"88"},{"1":"C10orf82","2":"2.16860475701111","3":"0.000126279613339478","_rn_":"89"},{"1":"PQLC3","2":"2.12379269879753","3":"0.000127374659900319","_rn_":"90"},{"1":"ITPRIP","2":"-1.84420928784153","3":"0.000131834514549397","_rn_":"91"},{"1":"CHRD","2":"2.08736661860143","3":"0.000132773388205511","_rn_":"92"},{"1":"GP2","2":"1.21432752833291","3":"0.000137242866017466","_rn_":"93"},{"1":"SRRM2-AS1","2":"1.07244757472239","3":"0.000145133555582464","_rn_":"94"},{"1":"DNAJC14","2":"0.734217467051836","3":"0.000146035261303241","_rn_":"95"},{"1":"DNAI1","2":"1.90508149337127","3":"0.000146124679254089","_rn_":"96"},{"1":"COX6C","2":"1.30171228444856","3":"0.000146227313818469","_rn_":"97"},{"1":"AGPAT4","2":"-1.90919842561092","3":"0.000150437535175252","_rn_":"98"},{"1":"TOB1","2":"2.1659777642967","3":"0.000154100978413497","_rn_":"99"},{"1":"MREG","2":"1.17917492518751","3":"0.000160062040085368","_rn_":"100"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<div id="heatmap" class="section level3">
+<h3>Heatmap</h3>
+<pre class="r"><code>heatmap_url&lt;-paste(&quot;http://www.ilincs.org/apps/heatmap/?sessionID=&quot;,createdSignaturesSessionID,&quot;&amp;property=&quot;,property,&quot;&amp;geneCount=100&quot;,sep = &quot;&quot;)
+include_url(heatmap_url, height = &quot;900px&quot;)</code></pre>
+<iframe src="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec_3_09_37_34_2018_3317810&amp;property=ER&amp;geneCount=100" width="910px" height="900px">
+</iframe>
+<!-- ### http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec_3_09_37_34_2018_3317810&property=ER&geneCount=100 -->
+<div id="heatmap-in-ilincs" class="section level4">
+<h4><a href="http://www.ilincs.org/apps/heatmap/?sessionID=Mon_Dec_3_09_37_34_2018_3317810&amp;property=ER&amp;geneCount=100">Heatmap in iLINCS</a></h4>
+</div>
+</div>
 </div>
 
 

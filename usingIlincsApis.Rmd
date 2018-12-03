@@ -3,9 +3,6 @@ title: "iLINCS API R Notebook"
 output:
   html_document:
     df_print: paged
-  html_notebook: default
-  pdf_document: default
-  word_document: default
 ---
 
 <!-- ## Prerequisites  -->
@@ -20,7 +17,7 @@ library(htmltools)
 ```
 
 ```{r set-options, echo=FALSE, cache=FALSE}
-options(width = "1400px")
+options(width = "200")
 ```
 ## Display Signature Libraries
 
@@ -132,14 +129,14 @@ groupAnalysisSessionID
 ```
 ### [Signature group heatmap on iLINCS](http://www.ilincs.org/apps/heatmap/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
 
-```{r, out.width="910px"}
+```{r, out.width="1200px"}
 heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
 include_url(heatmap_url, height = "900px")
 ```
 
 ### [Signature group PCA and tSNE app on iLINCS](http://www.ilincs.org/apps/pca/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
 
-```{r, out.width="910px"}
+```{r, out.width="1200px"}
 pca_url<-paste("http://www.ilincs.org/apps/pca/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
 include_url(pca_url, height = "900px")
 ```
@@ -207,5 +204,76 @@ ilincs_result <- data.frame(t(sapply(l,c)))
 ilincsSigMetaData<-fromJSON(content(req,type="text"))
 t(ilincs_result)
 ```
+### List of LINCS Datasets
+```{r}
+apiUrl <- "http://www.ilincs.org/api/PublicDatasets/getDatasets?lincs=true"
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+lincs_datasets <- fromJSON(json)
+lincsDatasets <- data.frame(lincs_datasets$data)
+lincsDatasets[c("experiment","assay","dataType")]
+```
+
+
+### Dataset metadata
+
+**Example:** EDS-1014  
+```{r}
+experiment <- "EDS-1014"
+
+apiUrl <- paste("http://www.ilincs.org/api/PublicDatasets/",experiment,sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+datasetMetaData <- fromJSON(json)
+datasetMetaData
+```
+
+[Heatmap for dataset `r experiment` on iLINCS](http://www.ilincs.org/apps/heatmap/?data_set=`r experiment`)
+
+[PCA and tSNE for dataset `r experiment` on iLINCS](http://www.ilincs.org/apps/pca/?data_set=`r experiment`)
+
+### Dataset sample metadata
+
+```{r}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/getSamples?id=",experiment,sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+sampleMeta <- fromJSON(json)
+sampleMetaData <- data.frame(sampleMeta$data$rows)
+head(sampleMetaData)
+```
+
+##Creating signature using iLINCS 
+[Create signature from dataset `r experiment` on iLINCS](http://www.ilincs.org/ilincs/dataset/`r experiment`/createSignature)
+
+##Creating signature using iLINCS API
+```{r Created Signature}
+property <- "ER"
+level1 <- "ER:+"
+level2 <- "ER:-"
+apiUrl <- "http://www.ilincs.org/api/ilincsR/LincsDataAnalysis"
+req <- POST(apiUrl, body = list(exp = paste(experiment),prop = property,filterchk=paste(level1,level2,sep = ",,,"),includeORexclude=1), encode = "json")
+createdSignaturesSessionID <- content(req)$sessionID
+createdSignaturesSessionID
+```
+
+##Top 100 genes in created signature
+```{r top 100 genes in signature}
+l <- lapply(content(req)$geneData, function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+top100signatureData <- ilincs_result[1:100,c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+top100signatureData
+```
+
+### Heatmap
+
+```{r, out.width="910px"}
+heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",createdSignaturesSessionID,"&property=",property,"&geneCount=100",sep = "")
+include_url(heatmap_url, height = "900px")
+```
+
+<!-- ### `r heatmap_url` -->
+
+####[Heatmap in iLINCS](`r heatmap_url`)
 
 
