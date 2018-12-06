@@ -59,7 +59,7 @@ ilincs_signatureId
 ###The first step is to retrieve the session id for creation of the signature data table
 ```{r retrieve signature data}
 req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId)), encode = "json")
-ilincs_sessionId<-unlist(content(req))
+ilincs_sessionId<-unlist(httr::content(req))
 ilincs_sessionId
 ```
 
@@ -74,7 +74,7 @@ head(signatureData)
 ```{r volcano plot}
 apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
 req <- GET(apiUrl)
-ilincs_volcanoUrl<-paste("http://www.ilincs.org",content(req)$url,sep="")
+ilincs_volcanoUrl<-paste("http://www.ilincs.org",httr::content(req)$url,sep="")
 include_graphics(ilincs_volcanoUrl)
 ```
 
@@ -82,7 +82,7 @@ include_graphics(ilincs_volcanoUrl)
 ```{r connected signatures}
 apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=",ilincs_libId,sep="")
 req <- GET(apiUrl)
-# prettify(content(req,type="text"))
+# prettify(httr::content(req,type="text"))
 ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
 head(ilincs_conn_df)
 ```
@@ -98,7 +98,7 @@ head(top100signature)
 ```{r connectivity by gene list}
 apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
 req <- POST(apiUrl, body = list(mode="geneList",metadata=TRUE,signatureProfile = list(genes=top100signature$Name_GeneSymbol)),encode = "json")
-ilincsEnrichedSignatures <- data.table::rbindlist(content(req)$sigScores, use.names = TRUE, fill = TRUE)
+ilincsEnrichedSignatures <- data.table::rbindlist(httr::content(req)$sigScores, use.names = TRUE, fill = TRUE)
 head(ilincsEnrichedSignatures)
 ```
 ## Get GSEA plot
@@ -106,7 +106,7 @@ head(ilincsEnrichedSignatures)
 apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
 req <- POST(apiUrl, body = list(signatureId = ilincs_signatureId,genes = top100signature$ID_geneid, output="png"), encode = "json")
 
-gseaPlotPng <- content(req)$fileName
+gseaPlotPng <- httr::content(req)$fileName
 gseaPlotUrl <- paste("http://www.ilincs.org/tmp/",gseaPlotPng,".png",sep="")
 include_graphics(gseaPlotUrl)
 ```
@@ -121,7 +121,7 @@ topDownregulatedGenes <- list(genesDown=top100signature$Name_GeneSymbol[top100si
 
 req <- POST("http://www.ilincs.org/api/ilincsR/findConcordancesSC", body = list(mode="UpDn",metadata=TRUE,signatureProfile = c(topUpRegulatedGenes, topDownregulatedGenes)),encode = "json")
 
-ilincsUpDnConnectedSignatures <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+ilincsUpDnConnectedSignatures <- data.table::rbindlist(httr::content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
 head(ilincsUpDnConnectedSignatures)
 ```
 
@@ -130,14 +130,14 @@ head(ilincsUpDnConnectedSignatures)
 signatureGroup <-ilincsUpDnConnectedSignatures$signatureID[1:20]
 apiUrl<-"http://www.ilincs.org/api/ilincsR/GroupLincsAnalysis"
 req<-POST(apiUrl, body = list(idList = signatureGroup,noOfGenes = 50), encode = "json")                   
-groupAnalysisSessionID <- content(req)$data[[2]]
+groupAnalysisSessionID <- httr::content(req)$data[[2]]
 groupAnalysisSessionID
 ```
 ### [Signature group heatmap on iLINCS](http://www.ilincs.org/apps/heatmap/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
 
 ```{r interactive heatmap, out.width="1200px"}
 heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
-# browseURL(heatmap_url)  ##uncoment to launch the browser
+browseURL(heatmap_url)  ##uncoment to launch the browser
 # include_url(heatmap_url, height = "900px")  ##uncomment to embed in iframe
 ```
 
@@ -145,9 +145,25 @@ heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",groupAnalysi
 
 ```{r dimensionality reduction, out.width="1200px", fig.align="center"}
 pca_url<-paste("http://www.ilincs.org/apps/pca/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
-# browseURL(pca_url)  ##uncoment to launch the browser
+browseURL(pca_url)  ##uncoment to launch the browser
 # include_url(pca_url, height = "900px")  ##uncomment to embed in iframe
 ```
+
+###Load r ExpressionSet from the signature analysis
+```{r group analysis data}
+load(url(paste("http://www.ilincs.org/tmp/filteredeset_",groupAnalysisSessionID,".RData",sep="")),verbose=T)
+eset<-get(paste("filteredeset_",groupAnalysisSessionID,sep=""))
+eset
+
+```
+###Download gct from the signature analysis
+```{r group analysis data gct}
+download.file(paste("http://www.ilincs.org/tmp/filteredeset_",groupAnalysisSessionID,".gct",sep=""),destfile="sigs.gct")
+sigs <- readLines(con <- file("sigs.gct"))
+head(sigs,n=10)
+```
+
+
 
 ##Find connected signatures based on user submitted full signature
 ###Creating a file to upload from previouslsy downloaded signature file
@@ -158,16 +174,17 @@ system(paste("head sigFile.tsv"))
 
 ###Upload the file
 ```{r connected signatures by uploading signature file}
+apiUrl<-"http://www.ilincs.org/api/SignatureMeta/upload"
 sigFile <- "sigFile.tsv"
-processFile <- content(POST("http://www.ilincs.org/api/SignatureMeta/upload", body=list(file=upload_file(sigFile))))
-signatureFile <- processFile$status$fileName[[1]]
+req <- POST(apiUrl, body=list(file=upload_file("sigFile.tsv")))
+signatureFile <- httr::content(req)$status$fileName[[1]]
 signatureFile
 ```
 ###Find connected signatures
 ```{r list connected signatures}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
 req <- (POST(apiUrl, body = list(file=signatureFile, lib="LIB_5", path="/mnt/raid/tmp/"), encode = "form"))
-output <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+output <- data.table::rbindlist(httr::content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
 head(output)
 ```
 ## Find connected compound perturbations
@@ -194,10 +211,12 @@ head(iLincsConnectedGeneticPerturbations)
 ```{r signature metadata}
 apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/",ilincs_signatureId,sep="")
 req <- GET(apiUrl)
-l <- lapply(content(req), function(x) unlist(x))
-ilincs_result <- data.frame(t(sapply(l,c)))
-ilincsSigMetaData<-fromJSON(content(req,type="text"))
-t(ilincs_result)
+ilincsJSON<-httr::content(req,type="text")
+prettify(ilincsJSON)
+```
+```{r as a list}
+ilincsSigMetaData<-fromJSON(ilincsJSON)
+head(ilincsSigMetaData)
 ```
 ### List of LINCS Datasets
 ```{r listing datasets}
@@ -248,13 +267,13 @@ level1 <- "ER:+"
 level2 <- "ER:-"
 apiUrl <- "http://www.ilincs.org/api/ilincsR/LincsDataAnalysis"
 req <- POST(apiUrl, body = list(exp = paste(experiment),prop = property,filterchk=paste(level1,level2,sep = ",,,"),includeORexclude=1), encode = "json")
-createdSignaturesSessionID <- content(req)$sessionID
+createdSignaturesSessionID <- httr::content(req)$sessionID
 createdSignaturesSessionID
 ```
 
 ##Top 100 genes in created signature
 ```{r top 100 genes in signature}
-l <- lapply(content(req)$geneData, function(x) unlist(x))
+l <- lapply(httr::content(req)$geneData, function(x) unlist(x))
 ilincs_result <- data.frame(t(sapply(l,c)))
 top100signatureData <- ilincs_result[1:100,c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
 head(top100signatureData)
@@ -265,7 +284,7 @@ head(top100signatureData)
 
 ```{r, out.width="1200px"}
 heatmap_url2<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",createdSignaturesSessionID,"&property=",property,"&geneCount=100",sep = "")
-# browseURL(heatmap_url2)  ##uncomment to launch in a browser
+browseURL(heatmap_url2)  ##uncomment to launch in a browser
 # include_url(heatmap_url2, height = "900px")  ##uncomment to embed in an iframe
 ```
 
