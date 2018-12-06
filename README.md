@@ -1,5 +1,4 @@
 #### [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
- [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
 
 # ilincsAPI in action
 
