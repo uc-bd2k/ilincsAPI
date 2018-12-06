@@ -1,3 +1,6 @@
+#### [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
+ [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
+
 # ilincsAPI in action
 
 This repository consists of set of exeamples to showcase the ways of interacting with [iLINCS](http://www.ilincs.org) API. The examples are implemented in the RStudio notebook usingIlincsApis.Rmd and the "knitted" html output of the notebook is provided in [usingIlincsApis.html](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html).
