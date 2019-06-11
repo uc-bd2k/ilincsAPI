@@ -183,7 +183,7 @@ signatureFile
 ###Find connected signatures
 ```{r list connected signatures}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
-req <- (POST(apiUrl, body = list(file=signatureFile, lib="LIB_5", path="/mnt/raid/tmp/"), encode = "form"))
+req <- (POST(apiUrl, body = list(file=signatureFile, lib="LIB_5"), encode = "form"))
 output <- data.table::rbindlist(httr::content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
 head(output)
 ```
