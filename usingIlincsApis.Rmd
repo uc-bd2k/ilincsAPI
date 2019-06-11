@@ -58,7 +58,7 @@ ilincs_signatureId
 ## Getting signature data and vulcano plot
 ###The first step is to retrieve the session id for creation of the signature data table
 ```{r retrieve signature data}
-req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId)), encode = "json")
+req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId), display = FALSE), encode = "json")
 ilincs_sessionId<-unlist(httr::content(req))
 ilincs_sessionId
 ```
