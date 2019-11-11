@@ -3,6 +3,7 @@ title: "iLINCS API R Notebook"
 output:
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 <style type="text/css">
 .main-container {
@@ -36,7 +37,8 @@ ilincs_libraries[,c("libraryID","libraryName")]
 ```
 
 ## Searching for signature using BROAD ID
-###Searching for signature for given term. In this example "Diclofenac" coumpound will be shown as an example.
+
+##### Searching for signature for given term. In this example **"Diclofenac"** coumpound will be shown as an example.
 
 ```{r search signatures}
 term <- "Diclofenac"
@@ -48,7 +50,7 @@ ilincs_result_df<-fromJSON(httr::content(req,type="text"))$data
 head(ilincs_result_df[,c("cellline","compound","concentration","signatureid","is_exemplar")])
 ```
 
-###Selecting a signature to analyze
+### Selecting a signature to analyze
 
 ```{r selectedSignature}
 ilincs_signatureId <- ilincs_result_df[1,"signatureid"]
@@ -56,7 +58,9 @@ ilincs_signatureId
 ```
 
 ## Getting signature data and vulcano plot
-###The first step is to retrieve the session id for creation of the signature data table
+
+##### The first step is to retrieve the session id for creation of the signature data table
+
 ```{r retrieve signature data}
 req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId), display = FALSE), encode = "json")
 ilincs_sessionId<-unlist(httr::content(req))
@@ -64,6 +68,7 @@ ilincs_sessionId
 ```
 
 ### Retrieving data
+
 ```{r volcano data}
 fileUrl=paste("http://www.ilincs.org/tmp/",ilincs_sessionId,".xls",sep="")
 signatureData<-read.table(fileUrl,sep="\t",header=T,stringsAsFactors = F)
@@ -71,6 +76,7 @@ head(signatureData)
 ```
 
 ### Insert volcano plot
+
 ```{r volcano plot}
 apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
 req <- GET(apiUrl)
@@ -86,8 +92,9 @@ req <- GET(apiUrl)
 ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
 head(ilincs_conn_df)
 ```
-##Find LINCS signatures connected to user a submitted signature
-###Creating user submitted signature in the form of a gene list
+## Find LINCS signatures connected to user a submitted signature
+
+##### Creating user submitted signature in the form of a gene list
 ```{r subsetting signature}
 # top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
 top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],]
@@ -95,6 +102,7 @@ head(top100signature)
 ```
 
 ### Uploading signature as a list genes for enrichment
+
 ```{r connectivity by gene list}
 apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
 req <- POST(apiUrl, body = list(mode="geneList",metadata=TRUE,signatureProfile = list(genes=top100signature$Name_GeneSymbol)),encode = "json")
@@ -112,7 +120,7 @@ include_graphics(gseaPlotUrl)
 ```
 
 
-##Signature as a list of up and down genes
+## Signature as a list of up and down genes
 ```{r up and down genes}
 apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
 
@@ -149,14 +157,14 @@ browseURL(pca_url)  ##uncoment to launch the browser
 # include_url(pca_url, height = "900px")  ##uncomment to embed in iframe
 ```
 
-###Load r ExpressionSet from the signature analysis
+### Load r ExpressionSet from the signature analysis
 ```{r group analysis data}
 load(url(paste("http://www.ilincs.org/tmp/filteredeset_",groupAnalysisSessionID,".RData",sep="")),verbose=T)
 eset<-get(paste("filteredeset_",groupAnalysisSessionID,sep=""))
 eset
 
 ```
-###Download gct from the signature analysis
+### Download gct from the signature analysis
 ```{r group analysis data gct}
 download.file(paste("http://www.ilincs.org/tmp/filteredeset_",groupAnalysisSessionID,".gct",sep=""),destfile="sigs.gct")
 sigs <- readLines(con <- file("sigs.gct"))
@@ -165,14 +173,14 @@ head(sigs,n=10)
 
 
 
-##Find connected signatures based on user submitted full signature
-###Creating a file to upload from previouslsy downloaded signature file
+## Find connected signatures based on user submitted full signature
+##### Creating a file to upload from previouslsy downloaded signature file
 ```{r}
 write.table(signatureData,file="sigFile.tsv",sep="\t",row.names=F,col.names = T,quote=F)
 system(paste("head sigFile.tsv"))
 ```
 
-###Upload the file
+### Upload the file
 ```{r connected signatures by uploading signature file}
 apiUrl<-"http://www.ilincs.org/api/SignatureMeta/upload"
 sigFile <- "sigFile.tsv"
@@ -180,7 +188,7 @@ req <- POST(apiUrl, body=list(file=upload_file("sigFile.tsv")))
 signatureFile <- httr::content(req)$status$fileName[[1]]
 signatureFile
 ```
-###Find connected signatures
+### Find connected signatures
 ```{r list connected signatures}
 apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
 req <- (POST(apiUrl, body = list(file=signatureFile, lib="LIB_5"), encode = "form"))
@@ -257,10 +265,10 @@ sampleMetaData <- data.frame(sampleMeta$data$rows)
 head(sampleMetaData)
 ```
 
-##Creating signature using iLINCS 
+## Creating signature using iLINCS
 [Create signature from dataset `r experiment` on iLINCS](http://www.ilincs.org/ilincs/dataset/`r experiment`/createSignature)
 
-##Creating signature using iLINCS API
+## Creating signature using iLINCS API
 ```{r creating signature from dataset}
 property <- "ER"
 level1 <- "ER:+"
@@ -271,7 +279,7 @@ createdSignaturesSessionID <- httr::content(req)$sessionID
 createdSignaturesSessionID
 ```
 
-##Top 100 genes in created signature
+## Top 100 genes in created signature
 ```{r top 100 genes in signature}
 l <- lapply(httr::content(req)$geneData, function(x) unlist(x))
 ilincs_result <- data.frame(t(sapply(l,c)))
@@ -287,7 +295,3 @@ heatmap_url2<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",createdSign
 browseURL(heatmap_url2)  ##uncomment to launch in a browser
 # include_url(heatmap_url2, height = "900px")  ##uncomment to embed in an iframe
 ```
-
-
-
-
