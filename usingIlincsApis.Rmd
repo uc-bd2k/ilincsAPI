@@ -184,7 +184,6 @@ system(paste("head ",tsvFileName,sep=""))
 ### Upload the file
 ```{r connected signatures by uploading signature file}
 apiUrl<-"http://www.ilincs.org/api/SignatureUploads/uploadToiLINCS"
-sigFile <- tsvFileName
 req <- POST(apiUrl, body=list(file=upload_file(tsvFileName)))
 uploadID <- httr::content(req)$id
 uploadID
