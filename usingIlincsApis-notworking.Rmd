@@ -1,0 +1,274 @@
+---
+title: "iLINCS API R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+<style type="text/css">
+.main-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+<!-- ## Prerequisites  -->
+
+```{r include = FALSE}
+library(knitr)
+library(tinytex)
+library(httr)
+library(jsonlite)
+library(htmltools)
+```
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = "200")
+```
+## Display Signature Libraries
+
+```{r list signature libraries}
+apiUrl <- "http://www.ilincs.org/api/SignatureLibraries"
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+ilincs_libraries <- fromJSON(json)
+ilincs_libraries[,c("libraryID","libraryName")]
+```
+
+## Searching for signature using BROAD ID
+###Searching for signature for given term. In this example "Diclofenac" coumpound will be shown as an example.
+
+```{r search signatures}
+term <- "Diclofenac"
+ilincs_libId<-"LIB_5"
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,"&library=",ilincs_libId,sep="")
+req <- GET(apiUrl)
+
+ilincs_result_df<-fromJSON(httr::content(req,type="text"))$data
+head(ilincs_result_df[,c("cellline","compound","concentration","signatureid","is_exemplar")])
+```
+
+###Selecting a signature to analyze
+
+```{r selectedSignature}
+ilincs_signatureId <- ilincs_result_df[1,"signatureid"]
+ilincs_signatureId
+```
+
+## Getting signature data and vulcano plot
+###The first step is to retrieve the session id for creation of the signature data table
+```{r retrieve signature data}
+req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId)), encode = "json")
+ilincs_sessionId<-unlist(content(req))
+ilincs_sessionId
+```
+
+### Retrieving data
+```{r volcano data}
+fileUrl=paste("http://www.ilincs.org/tmp/",ilincs_sessionId,".xls",sep="")
+signatureData<-read.table(fileUrl,sep="\t",header=T,stringsAsFactors = F)
+head(signatureData)
+```
+
+### Insert volcano plot
+```{r volcano plot}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/volcanoPlot?file=",ilincs_sessionId,".xls",sep="")
+req <- GET(apiUrl)
+ilincs_volcanoUrl<-paste("http://www.ilincs.org",content(req)$url,sep="")
+include_graphics(ilincs_volcanoUrl)
+```
+
+## Get connected signatures
+```{r connected signatures}
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=",ilincs_libId,sep="")
+req <- GET(apiUrl)
+# prettify(content(req,type="text"))
+ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
+head(ilincs_conn_df)
+```
+##Find LINCS signatures connected to user a submitted signature
+###Creating user submitted signature in the form of a gene list
+```{r subsetting signature}
+# top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],]
+head(top100signature)
+```
+
+### Uploading signature as a list genes for enrichment
+```{r connectivity by gene list}
+apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
+req <- POST(apiUrl, body = list(mode="geneList",metadata=TRUE,signatureProfile = list(genes=top100signature$Name_GeneSymbol)),encode = "json")
+ilincsEnrichedSignatures <- data.table::rbindlist(content(req)$sigScores, use.names = TRUE, fill = TRUE)
+head(ilincsEnrichedSignatures)
+```
+## Get GSEA plot
+```{r GSEA plot, out.width="910px"}
+apiUrl <- "http://www.ilincs.org/api/ilincsR/plotGSEA"
+req <- POST(apiUrl, body = list(signatureId = ilincs_signatureId,genes = top100signature$ID_geneid, output="png"), encode = "json")
+
+gseaPlotPng <- content(req)$fileName
+gseaPlotUrl <- paste("http://www.ilincs.org/tmp/",gseaPlotPng,".png",sep="")
+include_graphics(gseaPlotUrl)
+```
+
+
+##Signature as a list of up and down genes
+```{r up and down genes}
+apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
+
+topUpRegulatedGenes <- list(genesUp=top100signature$Name_GeneSymbol[top100signature$Value_LogDiffExp > 0])
+topDownregulatedGenes <- list(genesDown=top100signature$Name_GeneSymbol[top100signature$Value_LogDiffExp < 0])
+
+req <- POST("http://www.ilincs.org/api/ilincsR/findConcordancesSC", body = list(mode="UpDn",metadata=TRUE,signatureProfile = c(topUpRegulatedGenes, topDownregulatedGenes)),encode = "json")
+
+ilincsUpDnConnectedSignatures <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+head(ilincsUpDnConnectedSignatures)
+```
+
+## Group analysis of top 20 most connected signatures with signature of interest
+```{r group analysis}
+signatureGroup <-ilincsUpDnConnectedSignatures$signatureID[1:20]
+apiUrl<-"http://www.ilincs.org/api/ilincsR/GroupLincsAnalysis"
+req<-POST(apiUrl, body = list(idList = signatureGroup,noOfGenes = 50), encode = "json")                   
+groupAnalysisSessionID <- content(req)$data[[2]]
+groupAnalysisSessionID
+```
+### [Signature group heatmap on iLINCS](http://www.ilincs.org/apps/heatmap/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
+
+```{r interactive heatmap, out.width="1200px"}
+heatmap_url<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
+browseURL(heatmap_url)
+include_url(heatmap_url, height = "900px")
+```
+
+### [Signature group PCA and tSNE app on iLINCS](http://www.ilincs.org/apps/pca/?sessionID=`r groupAnalysisSessionID`&property=signatureID)
+
+```{r dimensionality reduction, out.width="1200px", fig.align="center"}
+pca_url<-paste("http://www.ilincs.org/apps/pca/?sessionID=",groupAnalysisSessionID,"&property=signatureID",sep = "")
+browseURL(pca_url)
+include_url(pca_url, height = "900px")
+```
+
+##Find connected signatures based on user submitted full signature
+###Creating a file to upload from previouslsy downloaded signature file
+```{r}
+write.table(signatureData,file="sigFile.tsv",sep="\t",row.names=F,col.names = T,quote=F)
+system(paste("head sigFile.tsv"))
+```
+
+###Upload the file
+```{r connected signatures by uploading signature file}
+sigFile <- "sigFile.tsv"
+processFile <- content(POST("http://www.ilincs.org/api/SignatureMeta/upload", body=list(file=upload_file(sigFile))))
+signatureFile <- processFile$status$fileName[[1]]
+signatureFile
+```
+###Find connected signatures
+```{r list connected signatures}
+apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
+req <- (POST(apiUrl, body = list(file=signatureFile, lib="LIB_5", path="/mnt/raid/tmp/"), encode = "form"))
+output <- data.table::rbindlist(content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+head(output)
+```
+## Find connected compound perturbations
+```{r connected compound perturbations}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=",signatureFile,"&library=LIB_5&metadata=TRUE",sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+iLincsConnectedCompoundPerturbations <- fromJSON(json)$enrichment
+head(iLincsConnectedCompoundPerturbations)
+```
+## Get connected genetic perturbations
+
+```{r connected genetic perturbations}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/signatureEnrichment?sigFile=",signatureFile,"&library=LIB_6",sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+iLincsConnectedGeneticPerturbations <- fromJSON(json)$enrichment
+head(iLincsConnectedGeneticPerturbations)
+```
+
+
+
+## Retriving Signature Metadata
+```{r signature metadata}
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/",ilincs_signatureId,sep="")
+req <- GET(apiUrl)
+l <- lapply(content(req), function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+ilincsSigMetaData<-fromJSON(content(req,type="text"))
+t(ilincs_result)
+```
+### List of LINCS Datasets
+```{r listing datasets}
+apiUrl <- "http://www.ilincs.org/api/PublicDatasets/getDatasets?lincs=true"
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+lincs_datasets <- fromJSON(json)
+lincsDatasets <- data.frame(lincs_datasets$data)
+lincsDatasets[c("experiment","assay","dataType")]
+```
+
+
+### Dataset metadata
+
+**Example:** EDS-1014  
+```{r dataset metadata}
+experiment <- "EDS-1014"
+
+apiUrl <- paste("http://www.ilincs.org/api/PublicDatasets/",experiment,sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+datasetMetaData <- fromJSON(json)
+datasetMetaData
+```
+
+[Heatmap for dataset `r experiment` on iLINCS](http://www.ilincs.org/apps/heatmap/?data_set=`r experiment`)
+
+[PCA and tSNE for dataset `r experiment` on iLINCS](http://www.ilincs.org/apps/pca/?data_set=`r experiment`)
+
+### Dataset sample metadata
+
+```{r samples metadata}
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/getSamples?id=",experiment,sep="")
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+sampleMeta <- fromJSON(json)
+sampleMetaData <- data.frame(sampleMeta$data$rows)
+head(sampleMetaData)
+```
+
+##Creating signature using iLINCS 
+[Create signature from dataset `r experiment` on iLINCS](http://www.ilincs.org/ilincs/dataset/`r experiment`/createSignature)
+
+##Creating signature using iLINCS API
+```{r creating signature from dataset}
+property <- "ER"
+level1 <- "ER:+"
+level2 <- "ER:-"
+apiUrl <- "http://www.ilincs.org/api/ilincsR/LincsDataAnalysis"
+req <- POST(apiUrl, body = list(exp = paste(experiment),prop = property,filterchk=paste(level1,level2,sep = ",,,"),includeORexclude=1), encode = "json")
+createdSignaturesSessionID <- content(req)$sessionID
+createdSignaturesSessionID
+```
+
+##Top 100 genes in created signature
+```{r top 100 genes in signature}
+l <- lapply(content(req)$geneData, function(x) unlist(x))
+ilincs_result <- data.frame(t(sapply(l,c)))
+top100signatureData <- ilincs_result[1:100,c("Name_GeneSymbol","Value_LogDiffExp","Significance_pvalue")]
+head(top100signatureData)
+```
+
+### Heatmap of data used in signature creation
+### [Signature group heatmap on iLINCS](http://www.ilincs.org/apps/heatmap/?sessionID=`r createdSignaturesSessionID`&property=`r property`&geneCount=100)
+
+```{r, out.width="1200px"}
+heatmap_url2<-paste("http://www.ilincs.org/apps/heatmap/?sessionID=",createdSignaturesSessionID,"&property=",property,"&geneCount=100",sep = "")
+browseURL(heatmap_url2)
+include_url(heatmap_url2, height = "900px")
+```
+
+
+
+
