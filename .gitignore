@@ -1,3 +1,7 @@
 
 *.nb.html
 !spec/*.html
+usingIlincsApis-notworking.*
+usingIlincsNewApis.*
+sigs.gct
+sigFile*
