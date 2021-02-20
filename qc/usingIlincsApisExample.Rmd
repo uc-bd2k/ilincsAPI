@@ -1,0 +1,401 @@
+---
+title: "iLINCS API R Notebook"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+<style type="text/css">
+.main-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+### Prerequisites  
+
+```{r include = FALSE}
+library(knitr)
+library(tinytex)
+library(httr)
+library(jsonlite)
+library(htmltools)
+library(wCorr)
+```
+
+### Define a function to download and retreive ilincs signatures
+```{r define function}
+get_ilincs_signature <- function(ilincs_signatureId) {
+    req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId), display = FALSE), encode = "json")
+    ilincs_sessionId<-unlist(httr::content(req))
+    #print(ilincs_sessionId)
+    fileUrl=paste("http://www.ilincs.org/tmp/",ilincs_sessionId,".xls",sep="")
+    signatureData<-read.table(fileUrl,sep="\t",header=T,stringsAsFactors = F)
+    #print(signatureData)
+  return(signatureData)
+}
+```
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = "200")
+library(dplyr)
+library(weights)
+library(rlist)
+require(data.table)
+```
+### Display Signature Libraries
+```{r list signature libraries}
+apiUrl <- "http://www.ilincs.org/api/SignatureLibraries"
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+ilincs_libraries <- fromJSON(json)
+ilincs_libraries[,c("libraryID","libraryName")]
+```
+#### Select 3 random signature from libraries LIB_5, LIB_6 and LIB_11 and check their connectivity against 5 reported connected signature
+```{r define parameters}
+number_of_random_sample_signatures <- 3
+number_of_random_connected_signatures <- 5
+```
+
+#### Searching for signatures
+
+```{r search signatures}
+primes_list <- list("LIB_5", "LIB_6", "LIB_11")
+
+for (p in primes_list) {
+  print(p)
+ 
+  ilincs_libId<-p
+  apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?library=",ilincs_libId,sep="")
+  req <- GET(apiUrl)
+
+  ilincs_result_df<-fromJSON(httr::content(req,type="text"))$data
+
+
+  print(dim(ilincs_result_df[floor(runif(1000, min=0, max=dim(ilincs_result_df)[1])),c("cellline","compound","concentration","signatureid","is_exemplar")]))
+  counter = 0
+  
+  for (sigloop in ilincs_result_df[floor(runif(number_of_random_sample_signatures, min=0, max=dim(ilincs_result_df)[1])),c("signatureid")]){
+    ilincs_signatureId = sigloop
+    print(ilincs_signatureId)
+    counter <- counter + 1
+    
+    print("download signature ======================================")
+    req <- POST("http://www.ilincs.org/api/ilincsR/downloadSignature", body = list(sigID = paste(ilincs_signatureId), display = FALSE), encode = "json")
+    ilincs_sessionId<-unlist(httr::content(req))
+    
+    fileUrl=paste("http://www.ilincs.org/tmp/",ilincs_sessionId,".xls",sep="")
+    signatureData <-read.table(fileUrl,sep="\t",header=T,stringsAsFactors = F)
+  
+    print("=============================================")
+    print("get connected signatures based on signatureid")
+    print("=============================================")
+    apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=",ilincs_libId,sep="")
+    req <- GET(apiUrl)
+    
+    ilincs_conn_df<-fromJSON(httr::content(req,type="text"))
+    result_of_connected_sigs_from_sigID <- ilincs_conn_df[,c("signatureid","similarity","pValue")]
+    result_of_connected_sigs_from_sigID<-result_of_connected_sigs_from_sigID[order(result_of_connected_sigs_from_sigID$similarity),]
+    print(head(result_of_connected_sigs_from_sigID))
+  
+    
+    print("========================================================================")
+    print("get connected signatures based on the downloaded signature with p value") 
+    print("========================================================================")
+    #print(ilincs_sessionId[1])
+    #print(toString(ilincs_sessionId[1]))
+    
+    file_name <- paste(ilincs_libId,"_", toString(ilincs_sessionId[1]), ".tsv", sep="")
+    write.table(signatureData,file=file_name,sep="\t",row.names=F,col.names = T,quote=F)
+    #system(paste("head sigFile.tsv"))
+    
+    
+    apiUrl<-"http://www.ilincs.org/api/SignatureMeta/upload"
+    sigFile <- file_name
+    in_data<-as.data.frame(fread(file_name))
+    in_data_orig<-as.data.frame(fread(file_name))
+    #print(in_data)
+   
+    req <- POST(apiUrl, body=list(file=upload_file(sigFile)))
+    #req <- POST(apiUrl, body=list(file=signatureData))
+    signatureFile <- httr::content(req)$status$fileName[[1]]
+    print(head(signatureFile))
+
+    apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
+    req <- (POST(apiUrl, body = list(file=signatureFile, lib=ilincs_libId), encode = "form"))
+    output <- data.table::rbindlist(httr::content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+    result_of_upload_complete_sig <- output[,c("signatureid","similarity","pValue")]
+    result_of_upload_complete_sig<-result_of_upload_complete_sig[order(result_of_upload_complete_sig$similarity),]
+    print(head(result_of_upload_complete_sig))
+    
+     #merge(authors, books, by.x="surname", by.y="name")
+    #for (sigloop in ilincs_result_df[
+    print("===========================================================================================================")
+    print("checking the accuracy of results via offline benchmarking on the downloaded complete signature with p-value")  
+    print("===========================================================================================================")
+      for(varIter in 1:number_of_random_connected_signatures)
+         {
+          #print(varIter)
+          compared_sig = result_of_upload_complete_sig[varIter,"signatureid"]
+          #print(compared_sig)
+          restart_data <- in_data
+          #print("--------------------")
+          
+          #vardiff <- get_ilincs_signature(toString(compared_sig))
+          #varpval <- as.data.frame(lincscpPValues[, toString(compared_sig)])
+          #if (ilincs_libId == "LIB_5"){
+            #print(as.data.frame(lincscpDiffExp[, "LINCSCP_159326"]))
+           # vardiff <- as.data.frame(lincscpDiffExp[, toString(compared_sig)])
+          #  varpval <- as.data.frame(lincscpPValues[, toString(compared_sig)])
+          #}
+         #if (ilincs_libId == "LIB_6"){
+          # vardiff <- as.data.frame(lincskdDiffExp[,toString(compared_sig)])
+           # varpval <- as.data.frame(lincskdPValues[,toString(compared_sig)])
+            
+         #}
+         #if (ilincs_libId == "LIB_11"){
+          # vardiff <- as.data.frame(lincsoeDiffExp[,toString(compared_sig)])
+           # varpval <- as.data.frame(lincsoePValues[,toString(compared_sig)])
+            
+      #}
+          com_sig <-get_ilincs_signature(toString(compared_sig))
+          rownames(com_sig) <- com_sig$ID_geneid
+          vardiff <- as.data.frame(com_sig[,c("Value_LogDiffExp")])
+          rownames(vardiff) <- com_sig$ID_geneid
+          varpval <- as.data.frame(com_sig[,c("Significance_pvalue")])
+          rownames(varpval) <- com_sig$ID_geneid
+                   
+          colnames(vardiff)<- c("compared_sig_dif")
+          colnames(varpval)<- c("compared_sig_pval")
+
+          restart_data<-merge(restart_data, vardiff, by.x="ID_geneid", by.y="row.names")
+          restart_data<-merge(restart_data, varpval, by.x="ID_geneid", by.y="row.names")
+          weight_vec <- c()
+          restart_data$"new_weight"<-(-1.0)*(log10(restart_data$"Significance_pvalue")+log10(restart_data$"compared_sig_pval"))
+           w_co <- weightedCorr(y=restart_data$"compared_sig_dif", x=restart_data$"Value_LogDiffExp", method="pearson", weights=restart_data$"new_weight")
+           
+          print(paste0("For signature: ", compared_sig, " calculated weighted correlation is:",w_co, " ilincs query results is: ", result_of_upload_complete_sig[varIter,"similarity"]))
+
+      }
+    
+    
+    print("==========================================================================")
+    print("get connected signatures based on the downloaded signature without p value") 
+    print("==========================================================================")
+    
+    
+    file_name <- paste(ilincs_libId,"_withot_pvalue_", toString(ilincs_sessionId[1]), ".tsv", sep="")
+    
+    signatureData_without_pvalue = subset(signatureData, select = -c(Significance_pvalue) )
+    write.table(signatureData_without_pvalue,file=file_name,sep="\t",row.names=F,col.names = T,quote=F)
+    
+    apiUrl<-"http://www.ilincs.org/api/SignatureMeta/upload"
+    sigFile <- file_name
+    in_data<-as.data.frame(fread(file_name))
+    
+   
+    req <- POST(apiUrl, body=list(file=upload_file(sigFile)))
+    
+    signatureFile <- httr::content(req)$status$fileName[[1]]
+    print(head(signatureFile))
+
+    apiUrl <- "http://www.ilincs.org/api/ilincsR/findConcordances"
+    req <- (POST(apiUrl, body = list(file=signatureFile, lib=ilincs_libId), encode = "form"))
+    output <- data.table::rbindlist(httr::content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+    result_of_upload_complete_sig <- output[,c("signatureid","similarity","pValue")]
+    result_of_upload_complete_sig<-result_of_upload_complete_sig[order(result_of_upload_complete_sig$similarity),]
+    print(head(result_of_upload_complete_sig))
+    
+    
+    print("==============================================================================================================")
+    print("checking the accuracy of results via offline benchmarking on the downloaded complete signature without p-value")  
+    print("==============================================================================================================")
+      for(varIter in 1:5)
+         {
+          
+          compared_sig = result_of_upload_complete_sig[varIter,"signatureid"]
+          
+          restart_data <- in_data
+          
+          
+          com_sig <-get_ilincs_signature(toString(compared_sig))
+          rownames(com_sig) <- com_sig$ID_geneid
+          vardiff <- as.data.frame(com_sig[,c("Value_LogDiffExp")])
+          rownames(vardiff) <- com_sig$ID_geneid
+          varpval <- as.data.frame(com_sig[,c("Significance_pvalue")])
+          rownames(varpval) <- com_sig$ID_geneid
+         
+          colnames(vardiff)<- c("compared_sig_dif")
+          colnames(varpval)<- c("compared_sig_pval")
+
+          restart_data<-merge(restart_data, vardiff, by.x="ID_geneid", by.y="row.names")
+          restart_data<-merge(restart_data, varpval, by.x="ID_geneid", by.y="row.names")
+          weight_vec <- c()
+          restart_data$"new_weight"<-(-1.0)*(log10(restart_data$"compared_sig_pval"))
+          w_co <- weightedCorr(y=restart_data$"compared_sig_dif", x=restart_data$"Value_LogDiffExp", method="pearson", weights=restart_data$"new_weight")
+           
+          print(paste0("For signature: ", compared_sig, " calculated weighted correlation is:",w_co, " ilincs query results is: ", result_of_upload_complete_sig[varIter,"similarity"]))
+
+      }
+    
+    print("========================================================================================================")
+    print("checking the accuracy of extreme correlation results via offline benchmarking on the submitted signature")
+    print("========================================================================================================")
+    print(head(result_of_connected_sigs_from_sigID))
+      for(varIter in 1:5)
+         {
+          
+          compared_sig = result_of_connected_sigs_from_sigID[varIter,"signatureid"]
+          
+          restart_data <- in_data_orig
+          
+      
+          com_sig <-get_ilincs_signature(toString(compared_sig))
+          rownames(com_sig) <- com_sig$ID_geneid
+          vardiff <- as.data.frame(com_sig[,c("Value_LogDiffExp")])
+          rownames(vardiff) <- com_sig$ID_geneid
+          varpval <- as.data.frame(com_sig[,c("Significance_pvalue")])
+          rownames(varpval) <- com_sig$ID_geneid
+          
+          colnames(vardiff)<- c("compared_sig_dif")
+          colnames(varpval)<- c("compared_sig_pval")
+          
+          v1<-(-1.0)*sign(vardiff)*log10(varpval)
+         
+          colnames(v1)<- c("v1")
+          rownames(v1) <- as.list(com_sig[,"ID_geneid"])
+        
+          v2<- as.data.frame((-1.0)*sign(restart_data[,"Value_LogDiffExp"])*log10(restart_data[,"Significance_pvalue"]))
+          rownames(v2) <- as.list(restart_data[,"ID_geneid"])
+          colnames(v2)<- c("v2")
+         
+
+          top100_1<-v1 %>% top_n(100)
+          top100_2<-v2 %>% top_n(100)
+          
+          bot100_1<-v1 %>% top_n(-100)
+          bot100_2<-v2 %>% top_n(-100)
+         
+          row_list_1<-rownames(top100_1)
+          row_list_2<-rownames(top100_2)
+     
+          row_list_1<-append(row_list_1,rownames(bot100_1))
+          row_list_2<-append(row_list_2,rownames(bot100_2))
+          for (p in rownames(v1)) {
+            if (!(p %in% row_list_1)){
+              
+              v1[p,"v1"] <- 0.0
+            }
+          }
+        
+          
+          for (p in rownames(v2)) {
+           
+            if (!(p %in% row_list_2)){
+             
+           
+              v2[p,"v2"] <- 0.0
+            
+            }
+          }
+
+          restart_data<-merge(restart_data, v1, by.x="ID_geneid", by.y="row.names")
+          
+          
+          restart_data<-merge(restart_data, v2, by.x="ID_geneid", by.y="row.names")
+          
+      
+           w_co <- weightedCorr(x=restart_data$"v1", y=restart_data$"v2", method="Pearson")
+          
+          
+          print(paste0("For signature: ", compared_sig, " calculated extreme correlation is:",w_co, " ilincs query results is: ", result_of_connected_sigs_from_sigID[varIter,"similarity"]))
+      }
+    print("=================================================================")
+    print("get connected signatures based on positive and negative gene list") 
+    print("=================================================================")
+    
+    top100signature <- signatureData[order(signatureData$Significance_pvalue)[1:100],]
+    
+    apiUrl="http://www.ilincs.org/api/ilincsR/findConcordancesSC"
+
+    topUpRegulatedGenes <- list(genesUp=top100signature$Name_GeneSymbol[top100signature$Value_LogDiffExp > 0])
+    topDownregulatedGenes <- list(genesDown=top100signature$Name_GeneSymbol[top100signature$Value_LogDiffExp < 0])
+    topUpRegulatedGeneIDs <- list(top100signature$ID_geneid[top100signature$Value_LogDiffExp > 0])
+    topDownregulatedGeneIDs <- list(top100signature$ID_geneid[top100signature$Value_LogDiffExp < 0])
+   
+
+    req <- POST("http://www.ilincs.org/api/ilincsR/findConcordancesSC", body = list(mode="UpDn",metadata=TRUE,signatureProfile = c(topUpRegulatedGenes, topDownregulatedGenes)),encode = "json")
+
+    ilincsUpDnConnectedSignatures <- data.table::rbindlist(httr::content(req)$concordanceTable, use.names = TRUE, fill = TRUE)
+  
+    print("=====================================================================================================")
+    print("checking the accuracy of positive and negative gene list correlation results via offline benchmarking")
+    print("=====================================================================================================")
+    
+    if(TRUE){
+      for(varIter in 1:5)
+         {
+      
+          compared_sig = ilincsUpDnConnectedSignatures[varIter,"signatureID"]
+         
+            com_sig <-get_ilincs_signature(toString(compared_sig))
+          rownames(com_sig) <- com_sig$ID_geneid
+          vardiff <- as.data.frame(com_sig[,c("Value_LogDiffExp")])
+          rownames(vardiff) <- com_sig$ID_geneid
+          varpval <- as.data.frame(com_sig[,c("Significance_pvalue")])
+          rownames(varpval) <- com_sig$ID_geneid
+          
+          colnames(vardiff)<- c("compared_sig_dif")
+          colnames(varpval)<- c("compared_sig_pval")
+      
+          v1<-vardiff
+         
+          colnames(v1)<- c("v1")
+          
+          v2 <- v1
+          colnames(v2)<- c("v2")
+          
+        
+          
+          v3 <- data.frame(matrix(ncol=1,nrow=0, dimnames=list(NULL, c("v3"))))
+          v4 <- data.frame(matrix(ncol=1,nrow=0, dimnames=list(NULL, c("v4"))))
+          
+          vvv <- data.frame(matrix(ncol=2,nrow=0, dimnames=list(NULL, c("xx", "yy"))))
+
+          for (p in rownames(v1)) {
+            
+            if ((p %in% unlist(topUpRegulatedGeneIDs, recursive = FALSE))){
+              
+              new_row <- c(1.0, v1[p,"v1"]) 
+              vvv <- rbind(vvv, new_row)
+            
+            }
+            else if ((p %in% unlist(topDownregulatedGeneIDs, recursive = FALSE))){
+              
+              new_row <- c(-1.0, v1[p,"v1"]) 
+              vvv <- rbind(vvv, new_row)
+              
+             
+            }
+           
+            
+          }
+         
+          res <- cor(vvv)
+
+         
+          print(paste0("For signature: ", compared_sig, " calculated correlation is:",unlist(res[1,2]), " ilincs query results is: ", ilincsUpDnConnectedSignatures[varIter,"similarity"]))
+          
+      }
+    }
+  
+        
+    print("++++++++++++++++++++++ Finished ++++++++++++++++++++++")
+
+
+
+  }
+}
+
+```
