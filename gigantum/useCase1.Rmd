@@ -1,0 +1,100 @@
+---
+title: "iLINCS API R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+<style type="text/css">
+.main-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+<!-- ## Prerequisites  -->
+#Loading packages
+```{r include = FALSE}
+library(knitr)
+library(tinytex)
+library(httr)
+library(jsonlite)
+library(htmltools)
+library(ggplot2)
+```
+#Setting default width option
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = "200")
+```
+
+# Display Signature Libraries
+```{r list signature libraries}
+apiUrl <- "http://www.ilincs.org/api/SignatureLibraries"
+req <- GET(apiUrl)
+json <- httr::content(req, as = "text")
+ilincs_libraries <- fromJSON(json)
+ilincs_libraries[,c("libraryID","libraryName")]
+```
+
+# Searching for MTOR CRIPR genetic loss of function (CGS) perturbation signatures in the MCF7 cell line
+
+```{r search signatures}
+term <- "MTOR"
+ilincs_libId<-"LIB_6"
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findTermWithSynonyms?term=",term,"&library=",ilincs_libId,sep="")
+req <- GET(apiUrl)
+
+mtorCgs<-fromJSON(httr::content(req,type="text"))$data
+mtorCgsMcf7<-mtorCgs[intersect(grep("MCF7",mtorCgs$cellline),grep("trt_xpr.cgs",mtorCgs$pert_type)),]
+mtorCgsMcf7[,c("cellline","time","treatment","signatureid","pert_type")]
+```
+# Finding and summarizing connected CGSes to the first MTOR CRISPR CGS (LINCSKD_33763)
+## Finding connected CGSes
+```{r connected CGSes}
+ilincs_signatureId <- mtorCgsMcf7$signatureid[1]
+
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=",ilincs_libId,sep="")
+req <- GET(apiUrl)
+
+connectedCgs<-fromJSON(httr::content(req,type="text"))
+head(connectedCgs[,c("signatureid","similarity","pValue","cellline","treatment")])
+```
+## Summary boxplot, Figure 2A in the manusript
+```{r connected CGSes Boxplot}
+geneFreq <- sort(table(connectedCgs$treatment[1:100]),decreasing=TRUE)[5:1]
+geneFreqDf<-data.frame(gene=factor(names(geneFreq),levels=names(geneFreq),ordered=T),geneFreq=as.vector(geneFreq))
+
+tp100cgs<-ggplot(data=geneFreqDf,aes(x=gene,y=geneFreq)) + 
+  geom_bar(stat="identity",fill="steelblue") + 
+  coord_flip() + theme_bw() +
+  theme(axis.ticks=element_line(color="grey80"),text=element_text(size=20),legend.key.size=unit(1,"cm"),axis.line.x=element_line(colour="black"),panel.grid.major=element_blank(),panel.grid.minor=element_blank(),panel.border=element_blank(),panel.background=element_blank()) +
+  labs(x="",y="Number of Signatures")
+print(tp100cgs)
+```
+
+# Finding and summarizing connected chemical perturbage (CP) signatures to MTOR CRISPR CGS (LINCSKD_33763)
+## Finding connected CPs
+```{r connected CPs}
+ilincs_libId<-"LIB_5"
+
+apiUrl <- paste("http://www.ilincs.org/api/SignatureMeta/findConcordantSignatures?sigID=",ilincs_signatureId,"&lib=",ilincs_libId,sep="")
+req <- GET(apiUrl)
+
+connectedCps<-fromJSON(httr::content(req,type="text"))
+head(connectedCps)
+```
+
+## Summary boxplot, Figure 2B in the manusript
+```{r connected CPs Boxplot}
+top100GeneTargets<-unlist(strsplit(connectedCps$GeneTargets[1:100],split="\\|"))
+geneFreq <- sort(table(top100GeneTargets),decreasing=TRUE)[5:1]
+geneFreqDf<-data.frame(gene=factor(names(geneFreq),levels=names(geneFreq),ordered=T),geneFreq=as.vector(geneFreq))
+
+tp100cps<-ggplot(data=geneFreqDf,aes(x=gene,y=geneFreq)) + 
+  geom_bar(stat="identity",fill="steelblue") + 
+  coord_flip() + theme_bw() +
+  theme(axis.ticks=element_line(color="grey80"),text=element_text(size=20),legend.key.size=unit(1,"cm"),axis.line.x=element_line(colour="black"),panel.grid.major=element_blank(),panel.grid.minor=element_blank(),panel.border=element_blank(),panel.background=element_blank()) +
+  labs(x="",y="Number of Signatures")
+tp100cps
+```
