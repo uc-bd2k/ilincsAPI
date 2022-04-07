@@ -2,6 +2,8 @@
 
 This repository consists of set of examples to showcase the ways of interacting with [iLINCS](http://www.ilincs.org) API. The examples are implemented in the Jupyter notebook usingIlincsApis.ipynb and "linked" to [Google colab](https://colab.research.google.com/github/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.ipynb).
 
+We also include a set of examples in R -- implemented in the RStudio notebook usingIlincsApis.Rmd and the "knitted" html output of the notebook is provided in usingIlincsApis.html.
+
 ## Get started
 To execute the code in the notebook, please click on the [Google colab](https://colab.research.google.com/github/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.ipynb) and execute code "chunks".
 
