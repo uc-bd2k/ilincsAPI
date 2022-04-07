@@ -1,8 +1,6 @@
-#### [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
-
 # ilincsAPI in action
 
-This repository consists of set of exeamples to showcase the ways of interacting with [iLINCS](http://www.ilincs.org) API. The examples are implemented in the Jupyter notebook usingIlincsApis.ipynb and the "linked" to [Google colab](https://colab.research.google.com/github/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.ipynb).
+This repository consists of set of examples to showcase the ways of interacting with [iLINCS](http://www.ilincs.org) API. The examples are implemented in the Jupyter notebook usingIlincsApis.ipynb and "linked" to [Google colab](https://colab.research.google.com/github/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.ipynb).
 
 ## Get started
 To execute the code in the notebook, please click on the [Google colab](https://colab.research.google.com/github/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.ipynb) and execute code "chunks".
