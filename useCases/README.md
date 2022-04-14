@@ -1,24 +1,18 @@
-## iLincs API useCases
+# iLincs API useCases
 
-### Prerequisites
+## Prerequisites
 
-R
+To execute the code in the useCase notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools. 
 
-### useCase1 - Identifying chemical perturbagens emulating genetic perturbation of MTOR protein
+```R
+install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools"))
+```
 
-R markdown source file - [useCase1.Rmd](../../../blob/master/useCases/useCase1.Rmd)
-
-Knitted [HTML](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase1.html) and 
-[PDF](https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase1.pdf)
-
-The equivalent interaction with iLincs website is presented [here](http://www.ilincs.org/help/useCases/Identifying%20chemical%20perturbagens%20emulating%20genetic%20perturbation%20of%20MTOR%20protein)
+## Use Cases
 
 
-### useCase2 - Mechanism of action analysis via connection to genetic perturbation signatures
-
-[link](http://www.ilincs.org/help/useCases/Mechanism%20of%20action%20analysis%20via%20connection%20to%20genetic%20perturbation%20signatures)
-
-
-### useCase3 - Proteo-genomics analysis of cancer driver events in breast cancer
-
-[link](http://www.ilincs.org/help/useCases/Proteo-genomics%20analysis%20of%20cancer%20driver%20events%20in%20breast%20cancer)
+|               | R Markdown source  | PDF/HTML output  | Web walkthrough |
+| ------------- |:------------------:|:----------------:|:---------------:|
+| <details><summary><b>useCase1</b></summary>Identifying chemical perturbagens<br>emulating genetic perturbation of MTOR protein</details>  | [useCase1.Rmd](../../../blob/master/useCases/useCase1.Rmd) | [PDF](https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase1.pdf) / [HTML](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase1.html) | [link](http://www.ilincs.org/help/useCases/Identifying%20chemical%20perturbagens%20emulating%20genetic%20perturbation%20of%20MTOR%20protein) |
+| <details><summary><b>useCase2</b></summary>Mechanism of action analysis via connection<br>to genetic perturbation signatures</details>  | [useCase2.Rmd](../../../blob/master/useCases/useCase2.Rmd) |   [PDF](https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase2.pdf) / [HTML](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase2.html) | [link](http://www.ilincs.org/help/useCases/Mechanism%20of%20action%20analysis%20via%20connection%20to%20genetic%20perturbation%20signatures) |
+| <details><summary><b>useCase3</b></summary>Proteo-genomics analysis of cancer driver events<br>in breast cancer</details>  | [useCase3.Rmd](../../../blob/master/useCases/useCase3.Rmd) |   [PDF](https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase3.pdf) / [HTML](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/useCases/useCase3.html) | [link](http://www.ilincs.org/help/useCases/Proteo-genomics%20analysis%20of%20cancer%20driver%20events%20in%20breast%20cancer) |
