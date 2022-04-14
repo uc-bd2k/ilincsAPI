@@ -2,10 +2,20 @@
 
 ## Prerequisites
 
-To execute the code in the useCase notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools. 
+To execute the code in the useCase notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools, enrichR. 
 
 ```R
-install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools"))
+install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools","enrichR"),repos = "http://cran.us.r-project.org")
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager",repos = "http://cran.us.r-project.org");
+    
+BiocManager::install(c("Biobase","ComplexHeatmap"))
+```
+
+Or from shell:
+```sh
+R -e 'install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools","enrichR"),repos = "http://cran.us.r-project.org")'
+R -e 'if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManager",repos = "http://cran.us.r-project.org"); BiocManager::install(c("Biobase","ComplexHeatmap"))'
 ```
 
 ## Use Cases
@@ -22,3 +32,17 @@ install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools"))
 After installing the prerequisites and loading Rmd file into RStudio click on "Knit" to create a PDF/HTML/Word output.
 
 ![knitting Rmd file](images/knitting.png "Knitting Rmd File")
+
+### Render command line
+
+It is also possible to render the usecases using the command line:
+
+* html output:
+```sh
+R -e 'rmarkdown::render("useCase1.Rmd", "html_document")'
+```
+
+* pdf output:
+```sh
+R -e 'rmarkdown::render("useCase1.Rmd", "pdf_document")'
+```
