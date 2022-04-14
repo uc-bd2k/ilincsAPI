@@ -11,7 +11,13 @@ Additional R markdown examples are included in subfolders:
 
 ## Get started
 
-To execute the code in the notebook, please click on the [Google colab](https://colab.research.google.com/github/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.ipynb) and execute code "chunks".
+To execute the code in the jupyter notebook, please click on the [Google colab](https://colab.research.google.com/github/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.ipynb) and execute code "chunks".
+
+## R Markdown
+
+See the same example implemented in R Markdown [usingIlincsApis.Rmd](https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.Rmd)
+
+The output is included [HTML](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html) / [PDF](https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.pdf)
 
 ### R Markdown Prerequisites
 
@@ -60,7 +66,3 @@ For more information about iLINCS and iLINCS API's see links below:
 
 ## [iLINCS support group](http://www.ilincs.org/ilincs/support)
 
-
-## [Using iLINCS API R markdown](https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.Rmd)
-
-## [Using iLINCS API HTML output](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
