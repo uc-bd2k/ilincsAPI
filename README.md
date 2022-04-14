@@ -6,8 +6,8 @@ We also include the same analysis implemented in R markdown -- implemented in th
 
 Additional R markdown examples are included in subfolders:
 
-* [useCases](useCases) 
-* [qc](qc)
+* [useCases](useCases) - use cases related to the manuscript
+* [qc](qc) - QC code
 
 ## Get started
 
@@ -15,11 +15,40 @@ To execute the code in the notebook, please click on the [Google colab](https://
 
 ### R Markdown Prerequisites
 
-To execute the code in the useCase notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools. 
+To execute the code in the useCase notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools, data.table and Biobase. 
 
 ```R
-install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools"))
+install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools","data.table"),repos = "http://cran.us.r-project.org")
+if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManager",repos = "http://cran.us.r-project.org"); BiocManager::install("Biobase")
 ```
+
+Or from shell:
+```sh
+R -e 'install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools","data.table"),repos = "http://cran.us.r-project.org")'
+R -e 'if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManager",repos = "http://cran.us.r-project.org"); BiocManager::install("Biobase")'
+```
+
+
+### Render in RStudio
+
+After installing the prerequisites and loading Rmd file into RStudio click on "Knit" to create a PDF/HTML/Word output.
+
+![knitting Rmd file](useCases/images/knitting.png "Knitting Rmd File")
+
+### Render command line
+
+It is also possible to render the usecases using the command line:
+
+* html output:
+```sh
+R -e 'rmarkdown::render("usingIlincsApis.Rmd", "html_document")'
+```
+
+* pdf output:
+```sh
+R -e 'rmarkdown::render("usingIlincsApis.Rmd", "pdf_document")'
+```
+
 
 For more information about iLINCS and iLINCS API's see links below:
 
