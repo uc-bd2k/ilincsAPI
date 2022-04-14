@@ -25,7 +25,10 @@ To execute the code in the useCase notebooks, please install RStudio, launch RSt
 
 ```R
 install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools","data.table"),repos = "http://cran.us.r-project.org")
-if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManager",repos = "http://cran.us.r-project.org"); BiocManager::install("Biobase")
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager",repos = "http://cran.us.r-project.org");
+    
+BiocManager::install("Biobase")
 ```
 
 Or from shell:
