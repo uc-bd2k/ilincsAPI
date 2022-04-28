@@ -22,7 +22,7 @@ R -e 'if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManage
 
 * [R Markdown source](../../../blob/master/qc/usingIlincsApisExample.Rmd) 
 * Output [PDF](https://github.com/uc-bd2k/ilincsAPI/blob/master/qc/usingIlincsApisExample.pdf)/[HTML](https://github.com/uc-bd2k/ilincsAPI/blob/master/qc/usingIlincsApisExample.html)
-* [Related documentation]
+* [Related documentation](Supplemental Quality Control.pdf)
 
 
 ## Creating Output
