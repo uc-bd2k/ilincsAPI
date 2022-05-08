@@ -17,7 +17,7 @@ To execute the code in the jupyter notebook, please click on the [Google colab](
 
 See the same example implemented in R Markdown [usingIlincsApis.Rmd](https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.Rmd)
 
-The output is included [HTML](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html) / [PDF](https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.pdf)
+The output is included [HTML](http://htmlpreview.github.io/?https://github.com/uc-bd2k/ilincsAPI/blob/master/usingIlincsApis.html)
 
 ### R Markdown Prerequisites
 
@@ -40,7 +40,7 @@ R -e 'if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManage
 
 ### Render in RStudio
 
-After installing the prerequisites and loading Rmd file into RStudio click on "Knit" to create a PDF/HTML/Word output.
+After installing the prerequisites and loading Rmd file into RStudio click on "Knit" to create a HTML/Word output.
 
 ![knitting Rmd file](useCases/images/knitting.png "Knitting Rmd File")
 
@@ -51,11 +51,6 @@ It is also possible to render the usecases using the command line:
 * html output:
 ```sh
 R -e 'rmarkdown::render("usingIlincsApis.Rmd", "html_document")'
-```
-
-* pdf output:
-```sh
-R -e 'rmarkdown::render("usingIlincsApis.Rmd", "pdf_document")'
 ```
 
 

@@ -5,17 +5,17 @@
 To execute the code in the ilincsQC code notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools, enrichR. 
 
 ```R
-install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools","enrichR"),repos = "http://cran.us.r-project.org")
+install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools", "httr", "data.table", "rmarkdown", "wCorr", "dplyr", "weights", "rlist"),repos = "http://cran.us.r-project.org")
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager",repos = "http://cran.us.r-project.org");
     
-BiocManager::install(c("Biobase","ComplexHeatmap"))
+BiocManager::install(c("Biobase", "ComplexHeatmap", "enrichR"))
 ```
 
 Or from shell:
 ```sh
-R -e 'install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools","enrichR"),repos = "http://cran.us.r-project.org")'
-R -e 'if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManager",repos = "http://cran.us.r-project.org"); BiocManager::install(c("Biobase","ComplexHeatmap"))'
+R -e 'install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools", "httr", "data.table", "rmarkdown", "wCorr", "dplyr", "weights", "rlist"),repos = "http://cran.us.r-project.org")'
+R -e 'if (!require("BiocManager", quietly = TRUE))  install.packages("BiocManager",repos = "http://cran.us.r-project.org"); BiocManager::install(c("Biobase", "ComplexHeatmap", "enrichR"))'
 ```
 
 ## ilincs QC
