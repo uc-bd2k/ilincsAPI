@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-To execute the code in the useCase notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools, enrichR. 
+To execute the code in the useCase notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools, httr, data.table as well as Biobase, ComplexHeatmap and enrichR. 
 
 ```R
 

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-To execute the code in the ilincsQC code notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools, enrichR. 
+To execute the code in the ilincsQC code notebooks, please install RStudio, launch RStudio and install following R packages: knitr, tinytex, httr, jsonlite, htmltools, httr, data.table, rmarkdown, wCorr, dplyr, weights, rlist as well as Biobase, ComplexHeatmap and enrichR. 
 
 ```R
 install.packages(c("knitr", "tinytex", "httr", "jsonlite", "htmltools", "httr", "data.table", "rmarkdown", "wCorr", "dplyr", "weights", "rlist"),repos = "http://cran.us.r-project.org")
