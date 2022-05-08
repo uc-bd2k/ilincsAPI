@@ -53,6 +53,9 @@ It is also possible to render the usecases using the command line:
 R -e 'rmarkdown::render("usingIlincsApis.Rmd", "html_document")'
 ```
 
+### Execution time
+
+All scripts execute in less than five minutes on a typical desktop or a laptop computer.
 
 For more information about iLINCS and iLINCS API's see links below:
 
