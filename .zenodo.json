@@ -1,0 +1,39 @@
+{
+    "description": "<p>Release for DOI</p>", 
+    "license": "other-open", 
+    "title": "uc-bd2k/ilincsAPI: ilincsAPI-NatComm-DOI", 
+    "version": "v1.0.0", 
+    "upload_type": "software", 
+    "publication_date": "2022-06-24", 
+    "creators": [
+        {
+            "affiliation": "University of Cincinnati", 
+            "name": "Mario Medvedovic"
+        }, 
+        {
+            "affiliation": "Cincinnati Children's Hospital Medical Center
+            "name": "Michal Kouril"
+        }, 
+        {
+            "affiliation": "University of Cincinnati"
+            "name": "Behrouz Shamsaei"
+        }, 
+        {
+          "affiliation": "University of Cincinnati"
+          "name": "Marcin Pilarczyk"
+        }
+    ], 
+    "access_right": "open", 
+    "related_identifiers": [
+        {
+            "scheme": "url", 
+            "identifier": "https://github.com/uc-bd2k/ilincsAPI/tree/v1.0.2", 
+            "relation": "isSupplementTo"
+        }, 
+        {
+            "scheme": "doi", 
+            "identifier": "10.5281/zenodo.6725646", 
+            "relation": "isVersionOf"
+        }
+    ]
+}
