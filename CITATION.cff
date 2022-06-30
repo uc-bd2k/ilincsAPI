@@ -1,0 +1,14 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Mario
+    given-names: Medvedovic
+  - family-names: Michal 
+    given-names: Kouril
+  - family-names: Behrouz
+    given-names: Shamsaei
+  - family-names: Marcin
+    given-names: Pilarczyk
+title: uc-bd2k/ilincsAPI: ilincsAPI-NatComm-DOI
+version: v1.0.0
+date-released: 2022-06-24
