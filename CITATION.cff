@@ -57,11 +57,10 @@ preferred-citation:
     given-names: Mario
  title: "Connecting omics signatures and revealing biological mechanisms with iLINCS"
  doi: "10.1038/s41467-022-32205-3"
- version: v1.0.0
  date-released: 2022-08-09
  journal: "Nature Communications"
  # month: 9
- # start: 1 # First page number
+ start: 4678 # First page number
  # end: 10 # Last page number
  issue: 1
  volume: 13
