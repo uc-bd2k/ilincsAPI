@@ -1,14 +1,66 @@
-cff-version: 1.1.0
+cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-  - family-names: Mario
-    given-names: Medvedovic
-  - family-names: Michal 
-    given-names: Kouril
-  - family-names: Behrouz
-    given-names: Shamsaei
-  - family-names: Marcin
-    given-names: Pilarczyk
-title: "uc-bd2k/ilincsAPI: ilincsAPI-NatComm-DOI"
+  - family-names: Pilarczyk
+    given-names: Marcin
+  - family-names: Fazel-Najafabadi
+    given-names: Mehdi
+  - family-names: Kouril 
+    given-names: Michal
+  - family-names: Shamsaei
+    given-names: Behrouz
+  - family-names: Vasiliauskas
+    given-names: Juozas
+  - family-names: Niu
+    given-names: Wen
+  - family-names: Mahi
+    given-names: Naim
+  - family-names: Zhang
+    given-names: Lixia
+  - family-names: Clark
+    given-names: Nicholas A.
+  - family-names: Ren
+    given-names: Yan
+  - family-names: White
+    given-names: Shana
+  - family-names: Karim
+    given-names: Rashid
+  - family-names: Xu
+    given-names: Huan
+  - family-names: Biesiada
+    given-names: Jacek
+  - family-names: Bennett
+    given-names: Mark F.
+  - family-names: Davidson
+    given-names: Sarah E.
+  - family-names: Reichard
+    given-names: John F.
+  - family-names: Roberts
+    given-names: Kurt
+  - family-names: Stathias
+    given-names: Vasileios
+  - family-names: Koleti
+    given-names: Amar
+  - family-names: Vidovic
+    given-names: Dusica
+  - family-names: Clarke
+    given-names: Daniel J. B.
+  - family-names: Schürer
+    given-names: Stephan C.
+  - family-names: Ma’ayan
+    given-names: Avi
+  - family-names: Meller
+    given-names: Jarek
+  - family-names: Medvedovic
+    given-names: Mario
+title: "Connecting omics signatures and revealing biological mechanisms with iLINCS"
+doi: "10.1038/s41467-022-32205-3"
 version: v1.0.0
-date-released: 2022-06-24
+date-released: 2022-08-09
+journal: "Nature Communications"
+# month: 9
+# start: 1 # First page number
+# end: 10 # Last page number
+issue: 1
+volume: 13
+year: 2022
