@@ -6,6 +6,7 @@ We also include the same analysis implemented in R markdown -- implemented in th
 
 Additional R markdown examples are included in subfolders:
 
+* [parallelAPI](parallelAPI) - Using the new parallel API
 * [useCases](useCases) - use cases related to the manuscript
 * [qc](qc) - QC code
 
