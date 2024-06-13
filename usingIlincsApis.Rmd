@@ -176,16 +176,20 @@ head(sigs,n=10)
 ## Find connected signatures based on user submitted full signature
 ##### Creating a file to upload from previouslsy downloaded signature file
 ```{r}
-write.table(signatureData,file="sigFile.tsv",sep="\t",row.names=F,col.names = T,quote=F)
-system(paste("head sigFile.tsv"))
+tsvFileName <- "sigFile.tsv"
+write.table(signatureData,file=tsvFileName,sep="\t",row.names=F,col.names = T,quote=F)
+system(paste("head ",tsvFileName,sep=""))
 ```
 
 ### Upload the file
 ```{r connected signatures by uploading signature file}
-apiUrl<-"http://www.ilincs.org/api/SignatureMeta/upload"
-sigFile <- "sigFile.tsv"
-req <- POST(apiUrl, body=list(file=upload_file("sigFile.tsv")))
-signatureFile <- httr::content(req)$status$fileName[[1]]
+apiUrl<-"http://www.ilincs.org/api/SignatureUploads/uploadToiLINCS"
+req <- POST(apiUrl, body=list(file=upload_file(tsvFileName)))
+uploadID <- httr::content(req)$id
+uploadID
+apiUrl <- paste("http://www.ilincs.org/api/ilincsR/uploadSignature")
+req <- POST(apiUrl, body=list(file=tsvFileName,path=uploadID), encode = "form")
+signatureFile <- httr::content(req)$fileName[[1]]
 signatureFile
 ```
 ### Find connected signatures
